@@ -62,7 +62,8 @@ Responda ESTRITAMENTE em formato JSON com o seguinte formato, sem markdown ao re
             );
 
             if (!response.ok) {
-                return res.status(502).json({ error: 'Erro ao consultar Gemini.' });
+                const errDetail = await response.text();
+                return res.status(502).json({ error: 'Erro ao consultar Gemini.', details: errDetail });
             }
 
             const data = await response.json();
@@ -103,7 +104,8 @@ Responda ESTRITAMENTE em JSON sem formatação markdown:
             );
 
             if (!response.ok) {
-                return res.status(502).json({ error: 'Erro ao consultar Gemini.' });
+                const errDetail = await response.text();
+                return res.status(502).json({ error: 'Erro ao consultar Gemini.', details: errDetail });
             }
 
             const data = await response.json();
