@@ -19,6 +19,8 @@
         search: '',
         sort: 'recent',
         openId: null,
+        selectedIndex: 0,
+        visibleScripts: [],
         extraTags: new Set(), // tags criadas nesta sessão, ainda não usadas em nenhum script
         editor: { id: '', favorite: false, tags: [], image: '', logs: [], createdAt: '', useCount: 0, snapshot: '' },
         vars: { code: '', names: [], scriptId: null }
@@ -310,13 +312,21 @@
         return codeEl;
     }
 
-    function buildCard(s) {
+    function scrollSelected() {
+        const r = document.querySelector('.row.sel');
+        if (r && typeof r.scrollIntoView === 'function') {
+            r.scrollIntoView({ block: 'nearest' });
+        }
+    }
+
+    function buildCard(s, idx) {
         const risks = detectRisks(s.code);
         const isOpen = state.openId === s.id;
+        const isSelected = idx === state.selectedIndex;
 
         const row = el('div', {
-            class: 'row' + (s.favorite ? ' favorite' : '') + (isOpen ? ' open' : ''),
-            dataset: { id: s.id }
+            class: 'row' + (s.favorite ? ' favorite' : '') + (isOpen ? ' open' : '') + (isSelected ? ' sel' : ''),
+            dataset: { id: s.id, index: String(idx) }
         });
 
         const star = el('button', {
@@ -372,6 +382,7 @@
         );
 
         const toggleRow = () => {
+            state.selectedIndex = idx;
             state.openId = state.openId === s.id ? null : s.id;
             renderCards();
         };
@@ -421,16 +432,24 @@
 
     function renderCards() {
         const grid = $('cardsGrid');
+        const foot = $('listFoot');
         const terms = norm(state.search).split(/\s+/).filter(Boolean);
         const list = state.scripts.filter(
             (s) => (state.filterTag === 'Todas' || s.tags.includes(state.filterTag)) && matchesSearch(s, terms)
         );
+        const sorted = sortScripts(list);
+        state.visibleScripts = sorted;
+        if (state.selectedIndex >= sorted.length) {
+            state.selectedIndex = Math.max(0, sorted.length - 1);
+        }
         grid.replaceChildren();
-        if (!list.length) {
+        if (!sorted.length) {
             grid.append(emptyState());
+            if (foot) foot.hidden = true;
             return;
         }
-        sortScripts(list).forEach((s) => grid.append(buildCard(s)));
+        if (foot) foot.hidden = false;
+        sorted.forEach((s, idx) => grid.append(buildCard(s, idx)));
     }
 
     async function restoreDemo() {
@@ -1129,12 +1148,18 @@
             const top = topOverlay();
             const mod = e.ctrlKey || e.metaKey;
 
-            if (e.key === 'Escape' && top) {
-                e.preventDefault();
-                if (top === 'varsOverlay') closeVars();
-                else if (top === 'aiOverlay') closeAi();
-                else requestCloseEditor();
-                return;
+            if (e.key === 'Escape') {
+                if (top) {
+                    e.preventDefault();
+                    if (top === 'varsOverlay') closeVars();
+                    else if (top === 'aiOverlay') closeAi();
+                    else requestCloseEditor();
+                    return;
+                }
+                if (document.activeElement === $('searchInput')) {
+                    $('searchInput').blur();
+                    return;
+                }
             }
             if (mod && e.key.toLowerCase() === 's' && top === 'editorOverlay') {
                 e.preventDefault();
@@ -1146,9 +1171,59 @@
                 startCopy($('scriptCode').value, state.editor.id || null);
                 return;
             }
-            if (e.key === '/' && !top && !$('appShell').hidden && !isTyping(e.target)) {
-                e.preventDefault();
-                $('searchInput').focus();
+
+            // Atalhos da lista de scripts quando nenhum modal está aberto
+            if (!top && !$('appShell').hidden) {
+                const typing = isTyping(e.target);
+
+                if (e.key === '/' && !typing) {
+                    e.preventDefault();
+                    $('searchInput').focus();
+                    return;
+                }
+
+                if (!typing && !mod && !e.altKey) {
+                    const currentScript = state.visibleScripts && state.visibleScripts[state.selectedIndex];
+
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        if (state.visibleScripts && state.visibleScripts.length) {
+                            state.selectedIndex = Math.min(state.visibleScripts.length - 1, state.selectedIndex + 1);
+                            renderCards();
+                            scrollSelected();
+                        }
+                        return;
+                    }
+
+                    if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        if (state.visibleScripts && state.visibleScripts.length) {
+                            state.selectedIndex = Math.max(0, state.selectedIndex - 1);
+                            renderCards();
+                            scrollSelected();
+                        }
+                        return;
+                    }
+
+                    if (e.key === 'Enter' && currentScript && e.target.tagName !== 'BUTTON') {
+                        e.preventDefault();
+                        state.openId = state.openId === currentScript.id ? null : currentScript.id;
+                        renderCards();
+                        return;
+                    }
+
+                    if ((e.key === 'c' || e.key === 'C') && currentScript) {
+                        e.preventDefault();
+                        startCopy(currentScript.code, currentScript.id);
+                        return;
+                    }
+
+                    if ((e.key === 'f' || e.key === 'F') && currentScript) {
+                        e.preventDefault();
+                        toggleFavorite(currentScript.id);
+                        return;
+                    }
+                }
             }
         });
     }
