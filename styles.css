@@ -130,6 +130,9 @@ body {
 button, input, textarea, select { font-family: inherit; }
 
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, [tabindex="0"]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px;
+}
 
 /* ---------- Ícones de linha ---------- */
 .icon {
@@ -501,12 +504,12 @@ code[class*="language-"], pre[class*="language-"] { color: var(--text); text-sha
 #toast.error { background-color: var(--danger); color: var(--bg); }
 
 /* ==========================================================
-   RESPONSIVO
+   RESPONSIVO & ACESSIBILIDADE
    ========================================================== */
 @media (max-width: 900px) {
-    .topbar, .toolbar { padding-left: 20px; padding-right: 20px; }
+    .topbar, .toolbar { padding-left: 16px; padding-right: 16px; }
     main { padding: 16px 14px 32px; }
-    .topbar-actions { justify-content: flex-start; }
+    .topbar-actions { justify-content: flex-start; gap: 8px; }
     .search-bar { max-width: none; flex-basis: 100%; order: -1; }
     .user-chip { border-left: none; padding-left: 0; }
     .editor-body { grid-template-columns: 1fr; }
@@ -519,6 +522,14 @@ code[class*="language-"], pre[class*="language-"] { color: var(--text); text-sha
     .row-tags, .row-date { display: none; }
     .row-preview { padding-left: 14px; }
     .btn-copy { opacity: 1; }
+    .foot { font-size: 11px; gap: 12px; }
+}
+
+@media (max-width: 600px) {
+    .btn-quiet span { display: none; }
+    .btn-quiet { padding: 8px 10px; }
+    .topbar { padding: 12px 14px; }
+    .toolbar { padding: 10px 14px; }
 }
 
 @media (max-width: 520px) {
@@ -528,5 +539,9 @@ code[class*="language-"], pre[class*="language-"] { color: var(--text); text-sha
 }
 
 @media (prefers-reduced-motion: reduce) {
-    * { transition: none !important; }
+    *, *::before, *::after {
+        transition: none !important;
+        animation: none !important;
+        scroll-behavior: auto !important;
+    }
 }
