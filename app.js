@@ -18,6 +18,7 @@
         filterTag: 'Todas',
         search: '',
         sort: 'recent',
+        openId: null,
         extraTags: new Set(), // tags criadas nesta sessão, ainda não usadas em nenhum script
         editor: { id: '', favorite: false, tags: [], image: '', logs: [], createdAt: '', useCount: 0, snapshot: '' },
         vars: { code: '', names: [], scriptId: null }
@@ -286,14 +287,36 @@
         });
     }
 
+    const SQL_KW = 'SELECT|FROM|WHERE|AND|OR|UPDATE|SET|INSERT|INTO|VALUES|DELETE|ALTER|CREATE|DROP|TABLE|VIEW|INDEX|TRIGGER|PROCEDURE|AS|JOIN|LEFT|RIGHT|INNER|OUTER|ON|GROUP BY|HAVING|ORDER BY|IS NOT NULL|IS NULL|NOT|IN|BETWEEN|LIKE|DISTINCT|LIMIT|OFFSET|FIRST|SKIP|COUNT|SUM|MAX|MIN|AVG|COALESCE|CAST|CASE|WHEN|THEN|ELSE|END|ACTIVE|INACTIVE|CURRENT_DATE|CURRENT_TIMESTAMP|NULL|ASC|DESC|EXECUTE|MERGE|WITH|RETURNING|PRIMARY KEY';
+    const SQL_TOKEN_RE = new RegExp(`(--[^\\n]*|\\/\\*[\\s\\S]*?\\*\\/)|('[^']*')|(@[A-Za-z_][\\w$]*|\\{[A-Za-z_][\\w$]*\\}|\\[[A-Za-z_][\\w$]*\\])|\\b(${SQL_KW})\\b`, 'gi');
+
+    function buildHighlightedCode(code) {
+        const codeEl = document.createElement('code');
+        const text = String(code || '');
+        let lastIndex = 0;
+        SQL_TOKEN_RE.lastIndex = 0;
+        let m;
+        while ((m = SQL_TOKEN_RE.exec(text)) !== null) {
+            if (m.index > lastIndex) {
+                codeEl.append(document.createTextNode(text.slice(lastIndex, m.index)));
+            }
+            const cls = m[1] ? 'c' : m[2] ? 's' : m[3] ? 'v' : 'k';
+            codeEl.append(el('span', { class: cls, text: m[0] }));
+            lastIndex = SQL_TOKEN_RE.lastIndex;
+        }
+        if (lastIndex < text.length) {
+            codeEl.append(document.createTextNode(text.slice(lastIndex)));
+        }
+        return codeEl;
+    }
+
     function buildCard(s) {
         const risks = detectRisks(s.code);
+        const isOpen = state.openId === s.id;
 
         const row = el('div', {
-            class: 'row' + (s.favorite ? ' favorite' : ''),
-            tabindex: '0',
-            role: 'button',
-            'aria-label': 'Abrir script ' + s.title
+            class: 'row' + (s.favorite ? ' favorite' : '') + (isOpen ? ' open' : ''),
+            dataset: { id: s.id }
         });
 
         const star = el('button', {
@@ -332,15 +355,53 @@
             startCopy(s.code, s.id);
         });
 
-        row.append(star, main, tagBox, el('div', { class: 'row-date', text: formatDate(s.updatedAt) }), copyBtn);
+        const head = el(
+            'div',
+            {
+                class: 'row-head',
+                tabindex: '0',
+                role: 'button',
+                'aria-expanded': String(isOpen),
+                'aria-label': 'Ver código de ' + s.title
+            },
+            star,
+            main,
+            tagBox,
+            el('div', { class: 'row-date', text: formatDate(s.updatedAt) }),
+            copyBtn
+        );
 
-        row.addEventListener('click', () => openEditor(s.id));
-        row.addEventListener('keydown', (e) => {
-            if (e.target === row && (e.key === 'Enter' || e.key === ' ')) {
+        const toggleRow = () => {
+            state.openId = state.openId === s.id ? null : s.id;
+            renderCards();
+        };
+
+        head.addEventListener('click', toggleRow);
+        head.addEventListener('dblclick', (e) => {
+            e.stopPropagation();
+            openEditor(s.id);
+        });
+        head.addEventListener('keydown', (e) => {
+            if (e.target === head && (e.key === 'Enter' || e.key === ' ')) {
                 e.preventDefault();
-                openEditor(s.id);
+                toggleRow();
             }
         });
+
+        const preview = el(
+            'div',
+            { class: 'row-preview' },
+            s.description ? el('p', { class: 'preview-desc', text: s.description }) : null,
+            el('pre', { class: 'preview-code' }, buildHighlightedCode(s.code)),
+            el(
+                'div',
+                { class: 'preview-actions' },
+                el('button', { class: 'btn btn-sm btn-outline', type: 'button', onclick: () => openEditor(s.id) }, 'Editar script'),
+                el('button', { class: 'btn btn-sm btn-outline', type: 'button', onclick: () => startCopy(s.code, s.id) }, icon('copy'), 'Copiar')
+            )
+        );
+
+        row.append(head, preview);
         return row;
     }
 
