@@ -43,6 +43,18 @@
     }
 
     const norm = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+    // Ícone de linha vindo do sprite no index.html (sem innerHTML)
+    function icon(name) {
+        const NS = 'http://www.w3.org/2000/svg';
+        const svg = document.createElementNS(NS, 'svg');
+        svg.setAttribute('class', 'icon');
+        svg.setAttribute('aria-hidden', 'true');
+        const use = document.createElementNS(NS, 'use');
+        use.setAttribute('href', '#i-' + name);
+        svg.append(use);
+        return svg;
+    }
     const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const formatDate = (iso) => new Date(iso).toLocaleDateString('pt-BR');
     const formatDateTime = (iso) => new Date(iso).toLocaleString('pt-BR');
@@ -275,23 +287,22 @@
         const star = el('button', {
             class: 'btn-star',
             type: 'button',
-            text: '⭐',
             title: s.favorite ? 'Desafixar do topo' : 'Fixar no topo',
             'aria-label': s.favorite ? 'Desafixar do topo' : 'Fixar no topo',
             'aria-pressed': String(!!s.favorite)
-        });
+        }, icon('star'));
         star.addEventListener('click', (e) => {
             e.stopPropagation();
             toggleFavorite(s.id);
         });
 
         const title = el('h3', { title: s.title }, s.title || 'Sem título');
-        if (s.image) title.append(el('span', { class: 'icon-image', title: 'Possui imagem', text: '🖼️' }));
+        if (s.image) title.append(el('span', { class: 'icon-image', title: 'Possui imagem' }, icon('image')));
 
         const tagBox = el('div', { class: 'card-tags' }, s.tags.map((t) => el('span', { text: t })));
-        if (risks.length) tagBox.prepend(el('span', { class: 'badge-danger', title: risks.join(' '), text: '⚠ Destrutivo' }));
+        if (risks.length) tagBox.prepend(el('span', { class: 'badge-danger', title: risks.join(' ') }, icon('alert'), 'Destrutivo'));
 
-        const copyBtn = el('button', { class: 'btn btn-sm btn-outline', type: 'button', text: '📋 Copiar' });
+        const copyBtn = el('button', { class: 'btn btn-sm btn-outline', type: 'button' }, icon('copy'), 'Copiar');
         copyBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             startCopy(s.code, s.id);
@@ -374,7 +385,7 @@
             toast('Não foi possível copiar. Selecione o texto e copie manualmente.', 'error');
             return;
         }
-        toast(okMsg || '✅ Código copiado!');
+        toast(okMsg || 'Código copiado!');
         if (scriptId) registerUse(scriptId);
     }
 
@@ -489,7 +500,7 @@
         const box = $('sqlWarning');
         const risks = detectRisks(code);
         box.hidden = risks.length === 0;
-        if (risks.length) box.replaceChildren(el('strong', { text: '⚠ Atenção: ' }), risks.join(' '));
+        if (risks.length) box.replaceChildren(el('strong', {}, icon('alert'), 'Atenção: '), risks.join(' '));
     }
 
     /* ---------- imagem ---------- */
@@ -743,7 +754,7 @@
             const level = m.confidence >= 0.7 ? '' : m.confidence >= 0.4 ? ' mid' : ' low';
 
             const openBtn = el('button', { class: 'btn btn-sm btn-outline', type: 'button', text: 'Abrir' });
-            const copyBtn = el('button', { class: 'btn btn-sm btn-outline', type: 'button', text: '📋 Copiar' });
+            const copyBtn = el('button', { class: 'btn btn-sm btn-outline', type: 'button' }, icon('copy'), 'Copiar');
 
             const openIt = () => {
                 closeAi();
@@ -768,12 +779,11 @@
                 el('button', {
                     class: 'btn btn-outline',
                     type: 'button',
-                    text: '+ Cadastrar este erro como novo script',
                     onclick: () => {
                         closeAi();
                         openEditor(null, { errorText: errorText });
                     }
-                })
+                }, icon('plus'), 'Cadastrar este erro como novo script')
             );
         }
         box.hidden = false;
@@ -1020,7 +1030,7 @@
         $('btnVarsCopyRaw').addEventListener('click', () => {
             const { code: c, scriptId } = state.vars;
             closeVars();
-            doCopy(c, scriptId, '✅ Copiado sem preencher as variáveis.');
+            doCopy(c, scriptId, 'Copiado sem preencher as variáveis.');
         });
         $('btnVarsCopyFilled').addEventListener('click', () => {
             const { code: c, names, scriptId } = state.vars;
@@ -1028,7 +1038,7 @@
             const missing = names.filter((n) => !values[n]);
             const out = applyVars(c, values);
             closeVars();
-            doCopy(out, scriptId, missing.length ? `Copiado, mas ${missing.length} variável(is) ficaram sem valor.` : '✅ Código copiado com os valores!');
+            doCopy(out, scriptId, missing.length ? `Copiado, mas ${missing.length} variável(is) ficaram sem valor.` : 'Código copiado com os valores!');
         });
 
         // Clique no fundo escuro fecha o modal
