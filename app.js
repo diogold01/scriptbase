@@ -1012,14 +1012,54 @@
     function bind() {
         // Entrada
         $('btnVisitor').addEventListener('click', () => startApp('visitor'));
+
+        let authMode = 'login';
+        const toggleAuthModeBtn = $('btnToggleAuthMode');
+        if (toggleAuthModeBtn) {
+            toggleAuthModeBtn.addEventListener('click', () => {
+                showAuthError('');
+                authMode = authMode === 'login' ? 'signup' : 'login';
+                if (authMode === 'signup') {
+                    $('btnLogin').textContent = 'Cadastrar';
+                    $('authSwitchText').textContent = 'Já tem uma conta?';
+                    toggleAuthModeBtn.textContent = 'Entrar';
+                } else {
+                    $('btnLogin').textContent = 'Entrar';
+                    $('authSwitchText').textContent = 'Não tem uma conta?';
+                    toggleAuthModeBtn.textContent = 'Cadastre-se';
+                }
+            });
+        }
+
         $('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             showAuthError('');
+            const email = $('loginEmail').value.trim();
+            const pass = $('loginPassword').value;
+            const submitBtn = $('btnLogin');
+            submitBtn.disabled = true;
+
             try {
-                await Auth.signIn($('loginEmail').value.trim(), $('loginPassword').value);
-                await startApp('owner');
+                if (authMode === 'login') {
+                    await Auth.signIn(email, pass);
+                    await startApp('owner');
+                } else {
+                    const data = await Auth.signUp(email, pass);
+                    if (data && data.session) {
+                        await startApp('owner');
+                        toast('Conta criada com sucesso!');
+                    } else {
+                        showAuthError('Conta criada! Se a confirmação de e-mail estiver ativa, confira sua caixa de entrada.');
+                        authMode = 'login';
+                        $('btnLogin').textContent = 'Entrar';
+                        $('authSwitchText').textContent = 'Não tem uma conta?';
+                        if (toggleAuthModeBtn) toggleAuthModeBtn.textContent = 'Cadastre-se';
+                    }
+                }
             } catch (err) {
                 showAuthError(err.message);
+            } finally {
+                submitBtn.disabled = false;
             }
         });
         $('btnLogout').addEventListener('click', logout);

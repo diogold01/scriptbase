@@ -334,6 +334,36 @@
                 throw fail(err, 'E-mail ou senha incorretos.');
             }
         },
+        async signUp(email, password) {
+            if (!this.isConfigured()) {
+                throw new Error('Serviço de autenticação ainda não configurado.');
+            }
+            let result;
+            try {
+                result = await getClient().auth.signUp({ email, password });
+            } catch (e) {
+                throw fail(e, 'Não foi possível conectar ao Supabase.');
+            }
+            if (result.error) {
+                const err = result.error;
+                const network = /fetch|network/i.test(err.name + ' ' + err.message) && !err.status;
+                if (network || err.status === 0 || err.status >= 500) {
+                    throw fail(err, 'Não foi possível conectar ao Supabase.');
+                }
+                const msg = err.message || '';
+                if (/already registered|user already exists/i.test(msg)) {
+                    throw fail(err, 'Este e-mail já está cadastrado. Faça login.');
+                }
+                if (/signups not allowed/i.test(msg)) {
+                    throw fail(err, 'Cadastros novos estão desativados no painel do Supabase.');
+                }
+                if (/password.*least.*characters/i.test(msg)) {
+                    throw fail(err, 'A senha deve ter pelo menos 6 caracteres.');
+                }
+                throw fail(err, msg || 'Não foi possível cadastrar a conta.');
+            }
+            return result.data;
+        },
         async signOut() {
             if (!this.isConfigured()) return;
             try {
