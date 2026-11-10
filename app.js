@@ -286,19 +286,11 @@
         });
     }
 
-    function snippet(code) {
-        return code
-            .split('\n')
-            .slice(0, 4)
-            .map((l) => (l.length > 64 ? l.slice(0, 64) + '…' : l))
-            .join('\n');
-    }
-
     function buildCard(s) {
         const risks = detectRisks(s.code);
 
-        const card = el('div', {
-            class: 'card' + (s.favorite ? ' favorite' : ''),
+        const row = el('div', {
+            class: 'row' + (s.favorite ? ' favorite' : ''),
             tabindex: '0',
             role: 'button',
             'aria-label': 'Abrir script ' + s.title
@@ -316,35 +308,40 @@
             toggleFavorite(s.id);
         });
 
-        const title = el('h3', { title: s.title }, s.title || 'Sem título');
+        const title = el('div', { class: 'row-title', title: s.title }, s.title || 'Sem título');
         if (s.image) title.append(el('span', { class: 'icon-image', title: 'Possui imagem' }, icon('image')));
 
-        const tagBox = el('div', { class: 'card-tags' }, s.tags.map((t) => el('span', {}, el('span', { class: 'dot', style: `background: ${tagColorVar(t)}` }), t)));
+        const main = el(
+            'div',
+            { class: 'row-main' },
+            title,
+            el('div', { class: 'row-desc', text: s.description || 'Nenhuma descrição informada.' })
+        );
+
+        const tagBox = el('div', { class: 'row-tags' }, s.tags.map((t) => el('span', {}, el('span', { class: 'dot', style: `background: ${tagColorVar(t)}` }), t)));
         if (risks.length) tagBox.prepend(el('span', { class: 'badge-danger', title: risks.join(' ') }, icon('alert'), 'Destrutivo'));
 
-        const copyBtn = el('button', { class: 'btn btn-sm btn-outline', type: 'button' }, icon('copy'), 'Copiar');
+        const copyBtn = el('button', {
+            class: 'btn-copy',
+            type: 'button',
+            title: 'Copiar script',
+            'aria-label': 'Copiar script'
+        }, icon('copy'));
         copyBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             startCopy(s.code, s.id);
         });
 
-        card.append(
-            star,
-            title,
-            el('p', { class: 'card-desc', text: s.description || 'Nenhuma descrição informada.' }),
-            el('div', { class: 'card-snippet', text: snippet(s.code) }),
-            tagBox,
-            el('div', { class: 'card-footer' }, el('span', { text: 'Atualizado: ' + formatDate(s.updatedAt) }), copyBtn)
-        );
+        row.append(star, main, tagBox, el('div', { class: 'row-date', text: formatDate(s.updatedAt) }), copyBtn);
 
-        card.addEventListener('click', () => openEditor(s.id));
-        card.addEventListener('keydown', (e) => {
-            if (e.target === card && (e.key === 'Enter' || e.key === ' ')) {
+        row.addEventListener('click', () => openEditor(s.id));
+        row.addEventListener('keydown', (e) => {
+            if (e.target === row && (e.key === 'Enter' || e.key === ' ')) {
                 e.preventDefault();
                 openEditor(s.id);
             }
         });
-        return card;
+        return row;
     }
 
     function emptyState() {
