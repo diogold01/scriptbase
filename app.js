@@ -175,24 +175,44 @@
         return list;
     }
 
+    function tagColorVar(tag) {
+        const k = norm(tag).replace(/[^a-z0-9]/g, '');
+        if (k.includes('fiscal')) return 'var(--d-fiscal)';
+        if (k.includes('estoque')) return 'var(--d-estoque)';
+        if (k.includes('financ')) return 'var(--d-financeiro)';
+        if (k.includes('venda')) return 'var(--d-vendas)';
+        if (k.includes('nfe') || k.includes('nfce')) return 'var(--d-nfe)';
+        if (k.includes('banco') || k.includes('bd')) return 'var(--d-banco)';
+        return 'var(--d-geral)';
+    }
+
     function renderFilterBar() {
         const tags = ['Todas', ...filterTags()];
         if (!tags.includes(state.filterTag)) state.filterTag = 'Todas';
         const bar = $('tagsFilterBar');
         bar.replaceChildren(
-            ...tags.map((t) =>
-                el('button', {
-                    type: 'button',
-                    class: 'tag-chip' + (t === state.filterTag ? ' active' : ''),
-                    dataset: { tag: t },
-                    text: t,
-                    onclick: () => {
-                        state.filterTag = t;
-                        renderFilterBar();
-                        renderCards();
-                    }
-                })
-            )
+            ...tags.map((t) => {
+                const isActive = t === state.filterTag;
+                const dot = t === 'Todas'
+                    ? null
+                    : el('span', { class: 'dot', style: `background: ${tagColorVar(t)}` });
+                return el(
+                    'button',
+                    {
+                        type: 'button',
+                        class: 'tag-chip' + (isActive ? ' active' : ''),
+                        'aria-pressed': String(isActive),
+                        dataset: { tag: t },
+                        onclick: () => {
+                            state.filterTag = t;
+                            renderFilterBar();
+                            renderCards();
+                        }
+                    },
+                    dot,
+                    t
+                );
+            })
         );
     }
 
@@ -299,7 +319,7 @@
         const title = el('h3', { title: s.title }, s.title || 'Sem título');
         if (s.image) title.append(el('span', { class: 'icon-image', title: 'Possui imagem' }, icon('image')));
 
-        const tagBox = el('div', { class: 'card-tags' }, s.tags.map((t) => el('span', { text: t })));
+        const tagBox = el('div', { class: 'card-tags' }, s.tags.map((t) => el('span', {}, el('span', { class: 'dot', style: `background: ${tagColorVar(t)}` }), t)));
         if (risks.length) tagBox.prepend(el('span', { class: 'badge-danger', title: risks.join(' ') }, icon('alert'), 'Destrutivo'));
 
         const copyBtn = el('button', { class: 'btn btn-sm btn-outline', type: 'button' }, icon('copy'), 'Copiar');

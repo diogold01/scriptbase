@@ -237,18 +237,27 @@ kbd {
 }
 .user-badge.owner { color: var(--success); border-color: var(--success); }
 
-/* ---------- Filtros ---------- */
+/* ---------- Filtros de categoria ---------- */
 .toolbar {
     display: flex; align-items: center; justify-content: space-between; gap: 20px;
     padding: 12px 40px; background-color: var(--bg); border-bottom: 1px solid var(--line);
 }
-.tags-filter { display: flex; gap: 10px; overflow-x: auto; flex: 1; padding-bottom: 2px; }
+.tags-filter { display: flex; gap: 4px; overflow-x: auto; flex: 1; padding-bottom: 2px; }
 .tag-chip {
-    background: transparent; border: 1px solid var(--line); color: var(--muted); padding: 6px 15px;
-    border-radius: 20px; cursor: pointer; transition: 0.2s; white-space: nowrap; font-size: 0.85rem; font-weight: 600;
+    border: 0; background: transparent; padding: 5px 10px; border-radius: 4px; cursor: pointer;
+    color: var(--muted); display: inline-flex; align-items: center; gap: 7px;
+    font-size: 0.88rem; font-weight: 400; transition: background-color 0.15s, color 0.15s;
+    white-space: nowrap;
 }
-.tag-chip:hover { border-color: var(--accent); color: var(--text); }
-.tag-chip.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.tag-chip:hover { background: var(--hover); color: var(--text); }
+.tag-chip.active, .tag-chip[aria-pressed="true"] {
+    color: var(--text); font-weight: 500; box-shadow: inset 0 -2px 0 var(--accent); border-radius: 0;
+    background: transparent;
+}
+.dot {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--dc, var(--muted));
+    flex: none; display: inline-block;
+}
 
 .sort-box { display: flex; align-items: center; gap: 8px; }
 .sort-box label { font-size: 0.8rem; color: var(--muted); font-weight: 600; }
@@ -289,10 +298,10 @@ main { flex: 1; padding: 30px 40px; overflow-y: auto; }
     border: 1px solid var(--line); border-radius: 4px; padding: 8px 10px; margin-bottom: 10px; flex: 1;
     overflow: hidden; white-space: pre; text-overflow: ellipsis; max-height: 74px;
 }
-.card-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
+.card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
 .card-tags span {
-    background: var(--bg); border: 1px solid var(--line); font-size: 0.7rem; padding: 3px 8px;
-    border-radius: 4px; color: var(--muted);
+    background: transparent; border: 1px solid var(--line); font-size: 0.75rem; padding: 3px 8px;
+    border-radius: 4px; color: var(--muted); display: inline-flex; align-items: center; gap: 6px;
 }
 .card-tags .badge-danger {
     border-color: var(--danger); color: var(--danger); background: transparent; font-weight: 600;
