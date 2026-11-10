@@ -332,6 +332,13 @@ main { flex: 1; padding: 20px 40px 40px; overflow-y: auto; }
 .empty-state h2 { color: var(--text); margin-bottom: 6px; font-weight: 500; }
 .empty-state .btn { margin-top: 12px; }
 
+/* Legenda de atalhos de teclado no rodapé */
+.foot {
+    display: flex; gap: 18px; margin-top: 14px; color: var(--muted); font-size: 12px; flex-wrap: wrap;
+    max-width: 1080px; margin-left: auto; margin-right: auto;
+}
+.foot span { display: inline-flex; align-items: center; gap: 6px; }
+
 /* ==========================================================
    MODAIS (base)
    ========================================================== */
