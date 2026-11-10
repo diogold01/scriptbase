@@ -1,121 +1,65 @@
 # ScriptBase
 
-Biblioteca web para organizacao, busca e execucao segura de scripts SQL em rotinas de suporte tecnico a sistemas ERP, com diagnostico assistido por inteligencia artificial.
+Biblioteca web para organização, busca e execução segura de scripts SQL em rotinas de suporte técnico a sistemas ERP, com diagnóstico assistido por inteligência artificial.
 
-Link da aplicacao: https://scriptbase-gules.vercel.app
+Link da aplicação: https://scriptbase-gules.vercel.app
 
-> Nota: Para testar a ferramenta no ar, clique em "Entrar como visitante". Os registros exibidos na demonstracao sao scripts ficticios para protecao de dados.
+> Para testar a ferramenta no ar, basta entrar como visitante. Os registros exibidos na demonstração são scripts fictícios para proteção de dados.
 
-![ScriptBase - Visao Geral no Tema Livro-razao](docs/screenshots/01-visao-geral-claro.png)
-
----
+![ScriptBase no Tema Livro-razão](docs/screenshots/01-visao-geral-claro.png)
 
 ## O problema real
 
-Trabalhando no suporte tecnico de ERPs e sistemas de gestao, a rotina de atendimento frequentemente lida com os mesmos incidentes de banco de dados repetidas vezes: notas fiscais presas em processamento, inconsistencias em tabelas de estoque apos quedas de energia, campos nulos apos atualizacoes de versao e erros conhecidos de integridade referencial.
+Trabalhando no suporte técnico de ERPs e sistemas de gestão, a rotina de atendimento frequentemente lida com os mesmos incidentes de banco de dados várias vezes ao dia. São notas fiscais presas em processamento, inconsistências em tabelas de estoque após quedas de energia, campos nulos após atualizações de versão e erros conhecidos de integridade referencial.
 
-Na pratica, a maioria das equipes mantem esses comandos salvos em blocos de notas, conversas de chat ou pastas locais no computador. Esse modelo traz tres riscos criticos:
-1. Dificuldade de encontrar o script exato no momento em que o cliente esta aguardando atendimento.
-2. Risco alto de rodar comandos UPDATE ou DELETE sem parametrizar clausulas WHERE ou sem preencher variaveis de identificacao.
-3. Falta de historico sobre quando aquele comando foi usado ou alterado pela ultima vez.
+Na prática, a maioria das equipes mantém esses comandos salvos em blocos de notas soltos, conversas de chat ou pastas locais no computador. Esse hábito traz riscos sérios para a operação. Fica difícil encontrar o script exato enquanto o cliente aguarda na linha, o risco de rodar comandos de atualização ou exclusão sem os filtros corretos é alto, e não existe histórico de quando aquele comando foi usado ou alterado pela última vez.
 
-O ScriptBase foi criado para centralizar essas solucoes em uma interface rapida e com travas de seguranca.
-
----
+O ScriptBase foi criado para centralizar essas soluções em uma interface rápida, limpa e com travas de segurança.
 
 ## O que a ferramenta faz
 
-- **Busca instantanea:** pesquisa por titulo, descricao, trechos da mensagem de erro e texto dentro do proprio codigo SQL.
-- **Navegacao por teclado:** atalhos completos para agilizar o atendimento (`/` para buscar, setas `↑`/`↓` para navegar, `Enter` para ver codigo, `C` para copiar e `F` para favoritar).
-- **Preview expansivel inline:** inspecao rapida do comando SQL formatado com realce de sintaxe sem sair da listagem principal.
-- **Parametrizacao de variaveis:** comandos que contem variaveis (como `@ID`, `{ID}` ou `[ID]`) abrem uma tela de preenchimento antes de copiar, evitando a execucao acidental de queries com valores de teste.
-- **Alerta visual para comandos destrutivos:** destaque e aviso em scripts que contem instrucoes de DROP, TRUNCATE ou DELETE.
-- **Organizacao por categorias:** categorizacao com codificacao de cores por modulo (Fiscal, Estoque, Financeiro, Vendas, NFe, Banco de Dados).
-- **Historico de manutencao:** registro automatico de data de alteracao e anotacoes de mudancas em cada script.
-- **Backup e portabilidade:** importacao e exportacao dos dados em formato JSON.
+A busca funciona de forma instantânea por título, descrição, trechos da mensagem de erro e até pelo texto dentro do próprio código SQL. 
 
-![Preview de Codigo SQL Inline](docs/screenshots/03-preview-codigo.png)
+Para agilizar o atendimento, a ferramenta conta com atalhos de teclado simples. Você pode pressionar a barra para buscar, usar as setas para navegar entre as linhas, Enter para abrir o código, C para copiar e F para favoritar. 
 
-![Editor de Scripts e Historico de Alteracoes](docs/screenshots/02-editor-script.png)
+Ao clicar em qualquer linha da lista, o código SQL é exibido logo abaixo com realce de sintaxe suave, permitindo conferir a consulta sem sair da tela principal. 
 
----
+Comandos que contêm variáveis abrem uma janela de preenchimento antes da cópia, garantindo que o analista informe os valores reais antes de executar o script no cliente. Queries com comandos destrutivos recebem um alerta visual de atenção, e cada script guarda seu próprio histórico com anotações de alterações e data da última modificação.
 
-## Uso de Inteligencia Artificial
+![Visualização de Código SQL na Lista](docs/screenshots/03-preview-codigo.png)
 
-A ferramenta integra modelos de linguagem para agilizar o fluxo de resolucao de incidentes sem comprometer dados sensiveis:
+![Editor de Scripts e Histórico de Alterações](docs/screenshots/02-editor-script.png)
 
-1. **Diagnostico de erro:** o analista cola a mensagem de erro retornada pelo banco (ex: Firebird / FireDAC) ou pela aplicacao do cliente. A IA analisa os scripts cadastrados na base e aponta a solucao com percentual de confianca e explicacao do motivo tecnico.
-2. **Sugestao de metadados:** ao cadastrar um novo comando SQL, o sistema analisa a query e sugere titulo conciso, descricao objetiva e tags pertinentes.
+## Uso de Inteligência Artificial
 
-![Diagnostico de Erro com Inteligencia Artificial](docs/screenshots/05-diagnostico-ia.png)
+A ferramenta utiliza inteligência artificial para acelerar a resolução de chamados sem colocar em risco dados sensíveis.
 
-### Privacidade e resiliencia (Fallback local)
-- **Protecao de dados:** o codigo SQL e os dados do cliente nunca sao enviados na chamada de diagnostico. Apenas a mensagem de erro e os titulos/descricoes dos scripts sao processados.
-- **Modo de contingencia:** se a conexao com a API de IA falhar ou estiver indisponivel, o sistema aciona automaticamente um algoritmo interno de analise lexico-semantica no navegador, identificando termos em comum e mantendo a ferramenta operacional.
+No diagnóstico de erro, o analista cola a mensagem retornada pelo banco ou pela aplicação, como erros comuns de Firebird e FireDAC. A IA analisa os scripts cadastrados na base e aponta a solução mais adequada, acompanhada de uma explicação técnica objetiva e do percentual de compatibilidade com o problema.
 
----
+Ao cadastrar um novo script, o sistema também sugere título, descrição e categorias pertinentes com base na estrutura da consulta enviada.
+
+![Diagnóstico de Erro com Inteligência Artificial](docs/screenshots/05-diagnostico-ia.png)
+
+O código SQL do cliente e informações de bancos locais nunca são enviados para a análise de diagnóstico. Apenas a mensagem de erro e os resumos dos scripts cadastrados passam pela IA. Além disso, caso a conexão com a API falhe ou fique indisponível, o sistema ativa automaticamente um motor local de busca por termos no próprio navegador, mantendo o trabalho do suporte sem interrupções.
 
 ## Design e Temas
 
-A interface adota o tema sóbrio "Livro-razão", projetado para longas horas de trabalho operacional em suporte técnico, com tipografia técnica (IBM Plex Sans e IBM Plex Mono), ausência de sombras pesadas e suporte nativo a temas Claro, Escuro e Automático (conforme preferência do sistema operacional).
+A interface utiliza o tema Livro-razão, pensado para rotinas de trabalho prolongadas. O visual prioriza clareza e contraste, utiliza a tipografia técnica IBM Plex e oferece suporte nativo aos modos Claro, Escuro e Automático, respeitando a preferência do sistema operacional.
 
-![ScriptBase - Tema Escuro](docs/screenshots/04-visao-geral-escuro.png)
-
----
+![ScriptBase no Tema Escuro](docs/screenshots/04-visao-geral-escuro.png)
 
 ## Arquitetura
 
-O projeto foi desenhado de forma enxuta, sem etapa de build complexa, facilitando manutencao e execucao direta:
+O projeto foi construído de forma enxuta e sem processos pesados de compilação, o que facilita a leitura e a manutenção do código.
 
-```text
-Navegador (HTML5 / CSS / Vanilla JS)
-  │
-  ├── Modo Visitante  ──> Armazenamento local (localStorage)
-  │
-  ├── Conta Pessoal   ──> Supabase (Auth + PostgreSQL com Row Level Security)
-  │
-  └── Recursos de IA ──> /api/ai (Vercel Serverless Function) ──> Google Gemini API
-```
-
----
-
-## Seguranca e decisoes tecnicas
-
-- **Row Level Security (RLS):** no banco de dados PostgreSQL (Supabase), o isolamento de dados e aplicado no nivel de linha. Consultas anonimas sao bloqueadas e usuarios autenticados so conseguem ler ou modificar exclusivamente os proprios scripts.
-- **Cadastro publico desativado:** criacao de novas contas desabilitada no provedor de autenticacao, mantendo o banco restrito ao operador.
-- **Protecao de credenciais:** a chave da API do Gemini fica restrita ao ambiente de execucao serverless na Vercel (variavel de ambiente), sem exposicao no codigo cliente.
-- **Prevencao contra XSS:** manipulacao do DOM realizada com `textContent` e criacao estruturada de elementos, evitando interpolacoes inseguras com `innerHTML`.
-- **Sem complexidade de build:** desenvolvido em HTML, CSS moderno e JavaScript puro para inicializacao instantanea e facilidade de auditoria.
-
----
+O navegador roda HTML, CSS e JavaScript puro. No modo visitante, os dados ficam salvos exclusivamente no armazenamento local da máquina. Na conta conectada, as informações sincronizam com o Supabase, utilizando PostgreSQL protegido por regras de segurança por linha, onde cada pessoa acessa somente os próprios registros. As consultas de inteligência artificial passam por uma função no servidor da Vercel para comunicar com o Google Gemini sem expor chaves públicas no navegador.
 
 ## Como executar localmente
 
-1. Clone o repositorio:
-   ```bash
-   git clone https://github.com/diogold01/scriptbase.git
-   cd scriptbase
-   ```
+Para rodar o projeto no seu computador, basta clonar o repositório e abrir o arquivo index.html em qualquer navegador moderno. O modo visitante funciona imediatamente, sem exigir nenhuma configuração externa.
 
-2. Abra o arquivo `index.html` diretamente em qualquer navegador.
-   - O modo visitante funciona de forma imediata sem necessidade de configuracao externa.
-
-3. Para conectar banco de dados e IA:
-   - Configure o arquivo `config.js` com as chaves publicas do seu projeto no Supabase.
-   - Execute o script `supabase/schema.sql` no SQL Editor do Supabase.
-   - Configure a variavel de ambiente `GEMINI_API_KEY` na hospedagem da Vercel.
-
----
-
-## Proximos passos
-
-- Integracao com Supabase Storage para armazenamento dedicado de capturas de tela e diagramas de tabelas.
-- Busca semantica avancada com embeddings vetoriais (pgvector).
-- Formatador e validador sintatico de dialetos SQL (Postgres, Firebird, SQL Server).
-- Controle de versoes com restauracao de alteracoes anteriores.
-
----
+Para habilitar a persistência na nuvem e os recursos de IA, configure o arquivo de configuração com as chaves públicas do seu projeto no Supabase, execute o script do banco no editor SQL da plataforma e adicione a chave da API do Gemini nas variáveis de ambiente da sua hospedagem.
 
 ## Sobre o desenvolvimento
 
-Projeto concebido e desenvolvido com foco em resolver um gargalo real de operacao de suporte tecnico a sistemas ERP, aliando arquitetura de dados segura e inteligencia artificial aplicada a produtividade diaria.
+Projeto desenvolvido para resolver uma dor real do dia a dia de suporte técnico a sistemas ERP, unindo segurança de dados, usabilidade limpa e inteligência artificial aplicada à produtividade da equipe.
