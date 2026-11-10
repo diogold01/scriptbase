@@ -8,10 +8,10 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <!-- Prism.js (realce de sintaxe) -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Prism.js (o realce de sintaxe usa as cores do tema em styles.css) -->
     <link rel="stylesheet" href="styles.css">
+    <script src="theme.js"></script>
 </head>
 <body>
 
@@ -61,6 +61,11 @@
                 <button type="button" class="btn btn-outline" id="btnImport" title="Restaurar backup JSON">📤 Importar</button>
                 <input type="file" id="importFile" accept=".json" hidden>
                 <button type="button" class="btn btn-primary" id="btnNew">+ Novo Script</button>
+                <div class="seg" role="group" aria-label="Tema">
+                    <button type="button" data-t="light" aria-pressed="false">Claro</button>
+                    <button type="button" data-t="system" aria-pressed="true">Auto</button>
+                    <button type="button" data-t="dark" aria-pressed="false">Escuro</button>
+                </div>
                 <div class="user-chip">
                     <span class="user-badge" id="userBadge">Visitante</span>
                     <button type="button" class="btn btn-sm btn-outline" id="btnLogout">Sair</button>
