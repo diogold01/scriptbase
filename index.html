@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScriptBase | Biblioteca de Scripts SQL com IA</title>
+    <meta name="description" content="Biblioteca pessoal de scripts SQL com busca, tags, histórico e diagnóstico de erros com IA.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Prism.js (realce de sintaxe) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- ============================================================
+         TELA DE ENTRADA (visitante ou dono)
+         ============================================================ -->
+    <section id="authScreen" class="auth-screen">
+        <div class="auth-card">
+            <div class="auth-logo"><span>{ }</span> ScriptBase</div>
+            <p class="auth-tagline">Sua biblioteca de scripts SQL, organizada e com IA.</p>
+
+            <button type="button" class="btn btn-primary btn-block" id="btnVisitor">👀 Entrar como visitante</button>
+            <p class="auth-hint">Explore com scripts de exemplo. Tudo que você criar fica só no seu navegador.</p>
+
+            <div class="auth-divider"><span>ou</span></div>
+
+            <form id="loginForm" autocomplete="on">
+                <div class="input-group">
+                    <label for="loginEmail">E-mail</label>
+                    <input type="email" id="loginEmail" placeholder="voce@exemplo.com" autocomplete="username" required>
+                </div>
+                <div class="input-group">
+                    <label for="loginPassword">Senha</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" required>
+                </div>
+                <button type="submit" class="btn btn-outline btn-block" id="btnLogin">Entrar</button>
+                <p class="auth-hint" id="authHint">Entre com seu e-mail e senha.</p>
+                <p class="auth-error" id="authError" role="alert" hidden></p>
+            </form>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         APLICAÇÃO
+         ============================================================ -->
+    <div id="appShell" class="app-shell" hidden>
+
+        <header class="topbar">
+            <div class="logo"><h1><span>{ }</span> ScriptBase</h1></div>
+
+            <div class="topbar-actions">
+                <div class="search-bar">
+                    <input type="search" id="searchInput" placeholder="Buscar por título, descrição, erro ou código...  ( / )" aria-label="Buscar scripts">
+                </div>
+                <button type="button" class="btn btn-ai" id="btnAiDiagnose" title="Cole o erro e a IA indica o script">🤖 Diagnosticar erro</button>
+                <button type="button" class="btn btn-outline" id="btnExport" title="Baixar backup em JSON">📥 Exportar</button>
+                <button type="button" class="btn btn-outline" id="btnImport" title="Restaurar backup JSON">📤 Importar</button>
+                <input type="file" id="importFile" accept=".json" hidden>
+                <button type="button" class="btn btn-primary" id="btnNew">+ Novo Script</button>
+                <div class="user-chip">
+                    <span class="user-badge" id="userBadge">Visitante</span>
+                    <button type="button" class="btn btn-sm btn-outline" id="btnLogout">Sair</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="toolbar">
+            <div class="tags-filter" id="tagsFilterBar" role="toolbar" aria-label="Filtrar por tag"></div>
+            <div class="sort-box">
+                <label for="sortSelect">Ordenar</label>
+                <select id="sortSelect">
+                    <option value="recent">Mais recentes</option>
+                    <option value="alpha">A → Z</option>
+                    <option value="used">Mais copiados</option>
+                </select>
+            </div>
+        </div>
+
+        <main>
+            <div class="grid-container" id="cardsGrid"></div>
+        </main>
+    </div>
+
+    <!-- ============================================================
+         MODAL: EDITOR DE SCRIPT
+         ============================================================ -->
+    <div class="overlay" id="editorOverlay" role="dialog" aria-modal="true" aria-labelledby="editorTitle">
+        <div class="modal editor-container">
+            <div class="modal-header">
+                <h2 id="editorTitle">Novo Script</h2>
+                <div class="modal-header-actions">
+                    <button type="button" class="btn btn-outline" id="btnModalCopy" hidden>📋 Copiar Código</button>
+                    <button type="button" class="btn btn-outline" id="btnCloseEditor">✕ Fechar</button>
+                </div>
+            </div>
+
+            <div class="modal-body editor-body">
+                <input type="hidden" id="scriptId">
+
+                <div class="input-group full-width">
+                    <label for="scriptTitle">Título da Query / Cenário</label>
+                    <input type="text" id="scriptTitle" placeholder="Ex: Correção de CFOP dos produtos" maxlength="150">
+                </div>
+
+                <div class="input-group full-width">
+                    <label>Módulo / Tags</label>
+                    <div class="tags-selector" id="tagsSelector"></div>
+                    <div class="new-tag-row">
+                        <input type="text" id="newTagInput" placeholder="Criar nova tag e pressionar Enter" maxlength="30">
+                        <button type="button" class="btn btn-sm btn-outline" id="btnAddTag">+ Tag</button>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="scriptError">Mensagem de Erro (opcional)</label>
+                    <textarea id="scriptError" class="error-area" placeholder="Ex: [FireDAC][Phys][FB]Dynamic SQL Error..."></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label>Anexo (print da tela ou do erro)</label>
+                    <div class="image-drop-zone" id="dropZone" tabindex="0">
+                        <span id="dropZoneText">Arraste a imagem, cole (Ctrl+V) ou clique</span>
+                        <input type="file" id="scriptImageFile" accept="image/*" hidden>
+                        <img id="imagePreview" src="" alt="Pré-visualização do anexo" hidden>
+                        <button type="button" class="btn btn-sm btn-outline" id="btnRemoveImage" hidden>Remover imagem</button>
+                    </div>
+                </div>
+
+                <div class="input-group full-width">
+                    <label for="scriptDesc">Descrição &amp; Funcionalidade</label>
+                    <textarea id="scriptDesc" rows="2" placeholder="Contexto do problema e o que o script resolve..."></textarea>
+                </div>
+
+                <div class="input-group full-width">
+                    <label for="scriptCode">
+                        <span>Script SQL</span>
+                        <span class="label-hint">Variáveis como @ID, {ID} ou [ID] pedem preenchimento ao copiar.</span>
+                    </label>
+                    <div class="code-wrapper">
+                        <textarea id="scriptCode" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+                        <pre aria-hidden="true"><code class="language-sql" id="codeHighlight"></code></pre>
+                    </div>
+                    <div class="sql-warning" id="sqlWarning" role="alert" hidden></div>
+                    <div class="ai-row">
+                        <button type="button" class="btn btn-sm btn-ai" id="btnAiSuggest">✨ Sugerir título, descrição e tags com IA</button>
+                        <span class="ai-status" id="aiSuggestStatus" aria-live="polite"></span>
+                    </div>
+                </div>
+
+                <div class="logs-container full-width" id="logsContainer" hidden>
+                    <div class="logs-title">Histórico de alterações</div>
+                    <div id="logsList"></div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <div class="footer-left">
+                    <button type="button" class="btn btn-danger" id="btnDelete" hidden>🗑️ Excluir</button>
+                    <button type="button" class="btn btn-outline" id="btnDuplicate" hidden>⧉ Duplicar</button>
+                </div>
+                <div class="footer-right">
+                    <button type="button" class="btn btn-outline" id="btnCancel">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnSave">💾 Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         MODAL: DIAGNÓSTICO DE ERRO COM IA
+         ============================================================ -->
+    <div class="overlay" id="aiOverlay" role="dialog" aria-modal="true" aria-labelledby="aiTitle">
+        <div class="modal modal-md">
+            <div class="modal-header">
+                <h2 id="aiTitle">🤖 Diagnosticar erro</h2>
+                <button type="button" class="btn btn-outline" id="btnAiClose">✕ Fechar</button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label for="aiErrorInput">Cole a mensagem de erro (ou descreva o problema do cliente)</label>
+                    <textarea id="aiErrorInput" class="error-area ai-input" rows="5" placeholder="Ex: SQL error code = -206, Column unknown CFOP_S_E"></textarea>
+                    <p class="label-hint">O erro e os títulos/descrições dos scripts são enviados ao Gemini para a análise. O código SQL não é enviado. Não inclua nomes ou dados de clientes.</p>
+                </div>
+                <div class="ai-row">
+                    <button type="button" class="btn btn-ai" id="btnAiRun">Analisar</button>
+                    <span class="ai-status" id="aiRunStatus" aria-live="polite"></span>
+                </div>
+                <div class="ai-result" id="aiResult" hidden></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         MODAL: PREENCHER VARIÁVEIS ANTES DE COPIAR
+         ============================================================ -->
+    <div class="overlay" id="varsOverlay" role="dialog" aria-modal="true" aria-labelledby="varsTitle">
+        <div class="modal modal-md">
+            <div class="modal-header">
+                <h2 id="varsTitle">Preencher variáveis</h2>
+                <button type="button" class="btn btn-outline" id="btnVarsCancel">✕ Cancelar</button>
+            </div>
+            <div class="modal-body">
+                <p class="vars-intro">Este script tem variáveis. Preencha os valores e copie já pronto para rodar.</p>
+                <div class="vars-fields" id="varsFields"></div>
+                <pre class="vars-preview"><code class="language-sql" id="varsPreview"></code></pre>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" id="btnVarsCopyRaw">Copiar sem preencher</button>
+                <button type="button" class="btn btn-primary" id="btnVarsCopyFilled">📋 Copiar com valores</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" role="status" aria-live="polite"></div>
+
+    <!-- Prism.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+
+    <!-- Ordem importa: dados de exemplo -> config -> SDK Supabase -> camada de dados -> IA -> interface -->
+    <script src="seed.js"></script>
+    <script src="config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="storage.js"></script>
+    <script src="ai.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
