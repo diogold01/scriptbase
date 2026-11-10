@@ -1,6 +1,49 @@
 // Função Serverless da Vercel: /api/ai
 // Executada no backend da Vercel sem expor a chave do Gemini ao navegador.
 
+const CANDIDATE_MODELS = [
+    'gemini-3.5-flash-lite',
+    'gemini-3.1-flash-lite',
+    'gemini-3.8-flash',
+    'gemini-flash-latest'
+];
+
+async function generateWithGemini(prompt, apiKey, isJson = true) {
+    let lastError = null;
+
+    for (const model of CANDIDATE_MODELS) {
+        try {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+            const body = {
+                contents: [{ parts: [{ text: prompt }] }]
+            };
+            if (isJson) {
+                body.generationConfig = { responseMimeType: 'application/json', temperature: 0.2 };
+            }
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (text) {
+                    return isJson ? JSON.parse(text) : text;
+                }
+            } else {
+                lastError = await response.text();
+            }
+        } catch (err) {
+            lastError = err.message;
+        }
+    }
+
+    throw new Error(lastError || 'Nenhum modelo do Gemini respondeu no momento.');
+}
+
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Método não permitido.' });
@@ -49,26 +92,7 @@ Responda ESTRITAMENTE em formato JSON com o seguinte formato, sem markdown ao re
   ]
 }`;
 
-            const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${apiKey}`,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }],
-                        generationConfig: { responseMimeType: 'application/json', temperature: 0.2 }
-                    })
-                }
-            );
-
-            if (!response.ok) {
-                const errDetail = await response.text();
-                return res.status(502).json({ error: 'Erro ao consultar Gemini.', details: errDetail });
-            }
-
-            const data = await response.json();
-            const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-            const parsed = JSON.parse(text);
+            const parsed = await generateWithGemini(prompt, apiKey, true);
             return res.status(200).json(parsed);
         }
 
@@ -91,32 +115,13 @@ Responda ESTRITAMENTE em JSON sem formatação markdown:
   "tags": ["Tag1", "Tag2"]
 }`;
 
-            const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${apiKey}`,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }],
-                        generationConfig: { responseMimeType: 'application/json', temperature: 0.2 }
-                    })
-                }
-            );
-
-            if (!response.ok) {
-                const errDetail = await response.text();
-                return res.status(502).json({ error: 'Erro ao consultar Gemini.', details: errDetail });
-            }
-
-            const data = await response.json();
-            const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-            const parsed = JSON.parse(text);
+            const parsed = await generateWithGemini(prompt, apiKey, true);
             return res.status(200).json(parsed);
         }
 
         return res.status(400).json({ error: 'Tarefa desconhecida.' });
     } catch (err) {
         console.error('API Error:', err);
-        return res.status(500).json({ error: 'Erro interno ao processar IA.' });
+        return res.status(500).json({ error: 'Erro ao processar IA: ' + err.message });
     }
 }
