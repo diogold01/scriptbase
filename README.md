@@ -2,7 +2,7 @@
 
 Biblioteca web para organizacao, busca e execucao segura de scripts SQL em rotinas de suporte tecnico, com diagnostico assistido por inteligencia artificial.
 
-Link da aplicacao: [LINK DA DEMO]
+Link da aplicacao: https://scriptbase-gules.vercel.app
 
 > Nota: Para testar a ferramenta, clique em "Entrar como visitante". Os registros exibidos na demonstracao sao scripts ficticios para protecao de dados.
 
