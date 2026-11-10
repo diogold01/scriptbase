@@ -207,6 +207,15 @@ textarea { resize: vertical; }
 .auth-tagline { text-align: center; color: var(--muted); font-size: 0.95rem; margin-bottom: 8px; }
 .auth-hint { font-size: 0.8rem; color: var(--muted); text-align: center; line-height: 1.5; }
 .auth-error { font-size: 0.85rem; color: var(--danger); text-align: center; }
+.auth-switch {
+    display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.85rem; color: var(--muted);
+    margin-top: 2px;
+}
+.btn-link {
+    background: transparent; border: none; color: var(--accent); cursor: pointer; font-size: inherit;
+    font-weight: 500; text-decoration: underline; text-underline-offset: 3px; padding: 0;
+}
+.btn-link:hover { color: var(--accent-hover); }
 .auth-divider { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 0.8rem; margin: 6px 0; }
 .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--line); }
 #loginForm { display: flex; flex-direction: column; gap: 14px; }

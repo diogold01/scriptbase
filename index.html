@@ -56,7 +56,11 @@
                     <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" required>
                 </div>
                 <button type="submit" class="btn btn-outline btn-block" id="btnLogin">Entrar</button>
-                <p class="auth-hint" id="authHint">Entre com seu e-mail e senha.</p>
+                <div class="auth-switch">
+                    <span id="authSwitchText">Não tem uma conta?</span>
+                    <button type="button" class="btn-link" id="btnToggleAuthMode">Cadastre-se</button>
+                </div>
+                <p class="auth-hint" id="authHint" hidden></p>
                 <p class="auth-error" id="authError" role="alert" hidden></p>
             </form>
         </div>
