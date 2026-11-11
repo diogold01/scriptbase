@@ -31,6 +31,8 @@
         <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9L12 3Z"/></symbol>
         <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></symbol>
         <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.1 12.3a1 1 0 0 1 0-.7 10.8 10.8 0 0 1 19.8 0 1 1 0 0 1 0 .7 10.8 10.8 0 0 1-19.8 0"/><circle cx="12" cy="12" r="3"/></symbol>
+        <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+        <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></symbol>
     </svg>
 
     <!-- ============================================================
@@ -40,6 +42,11 @@
         <div class="auth-card">
             <div class="auth-logo"><span>{ }</span> ScriptBase</div>
             <p class="auth-tagline">Sua biblioteca de scripts SQL, organizada e com IA.</p>
+
+            <div class="auth-invite-banner" id="authInviteBanner" hidden>
+                <svg class="icon" aria-hidden="true"><use href="#i-users"/></svg>
+                <span>Você recebeu um convite para colaborar em uma equipe. Entre na sua conta ou cadastre-se abaixo para acessar.</span>
+            </div>
 
             <button type="button" class="btn btn-primary btn-block" id="btnVisitor"><svg class="icon" aria-hidden="true"><use href="#i-eye"/></svg>Entrar como visitante</button>
             <p class="auth-hint">Explore com scripts de exemplo. Tudo que você criar fica só no seu navegador.</p>
@@ -81,6 +88,7 @@
                     <kbd>/</kbd>
                 </div>
                 <button type="button" class="btn btn-ai" id="btnAiDiagnose" title="Cole o erro e a IA indica o script"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>Diagnosticar erro</button>
+                <button type="button" class="btn btn-quiet" id="btnTeam" title="Compartilhar com a equipe" hidden><svg class="icon" aria-hidden="true"><use href="#i-users"/></svg><span>Equipe</span></button>
                 <button type="button" class="btn btn-quiet" id="btnExport" title="Baixar backup em JSON"><svg class="icon" aria-hidden="true"><use href="#i-download"/></svg><span>Exportar</span></button>
                 <button type="button" class="btn btn-quiet" id="btnImport" title="Restaurar backup JSON"><svg class="icon" aria-hidden="true"><use href="#i-upload"/></svg><span>Importar</span></button>
                 <input type="file" id="importFile" accept=".json" hidden>
@@ -91,6 +99,7 @@
                     <button type="button" data-t="dark" aria-pressed="false">Escuro</button>
                 </div>
                 <div class="user-chip">
+                    <select id="workspaceSelect" class="workspace-select" hidden aria-label="Espaço de trabalho"></select>
                     <span class="user-badge" id="userBadge">Visitante</span>
                     <button type="button" class="btn btn-sm btn-outline" id="btnLogout">Sair</button>
                 </div>
@@ -247,6 +256,41 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline" id="btnVarsCopyRaw">Copiar sem preencher</button>
                 <button type="button" class="btn btn-primary" id="btnVarsCopyFilled"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>Copiar com valores</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         MODAL: GERENCIAR EQUIPE E CONVITES
+         ============================================================ -->
+    <div class="overlay" id="teamOverlay" role="dialog" aria-modal="true" aria-labelledby="teamTitle">
+        <div class="modal modal-md">
+            <div class="modal-header">
+                <h2 id="teamTitle">Compartilhar com a equipe</h2>
+                <button type="button" class="btn btn-outline" id="btnTeamClose"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg>Fechar</button>
+            </div>
+            <div class="modal-body">
+                <div class="team-section">
+                    <label class="team-label" for="teamInviteLink">Link de convite direto</label>
+                    <p class="team-hint">Envie este link para seu colega de trabalho. Ao abrir, ele faz login ou cria o cadastro na hora e passa a colaborar na sua biblioteca imediatamente.</p>
+                    <div class="team-link-row">
+                        <input type="text" id="teamInviteLink" class="team-link-input" readonly spellcheck="false">
+                        <button type="button" class="btn btn-primary" id="btnCopyTeamLink"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>Copiar link</button>
+                    </div>
+                    <div class="team-link-actions">
+                        <button type="button" class="btn-link" id="btnRegenerateLink"><svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg>Gerar novo link (invalida o anterior)</button>
+                    </div>
+                </div>
+
+                <div class="team-section">
+                    <div class="team-members-header">
+                        <span class="team-label">Membros da equipe</span>
+                        <span class="team-count" id="teamMembersCount">0 membros</span>
+                    </div>
+                    <div id="teamMembersList" class="team-members-list">
+                        <!-- Itens renderizados via JS -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>

@@ -205,6 +205,12 @@ textarea { resize: vertical; }
 .auth-logo { font-size: 1.6rem; font-weight: 600; color: var(--text); text-align: center; }
 .auth-logo span { color: var(--accent); font-family: var(--font-mono); font-weight: 500; }
 .auth-tagline { text-align: center; color: var(--muted); font-size: 0.95rem; margin-bottom: 8px; }
+.auth-invite-banner {
+    display: flex; align-items: center; gap: 10px; background: var(--hover);
+    border: 1px solid var(--accent); border-radius: 6px; padding: 10px 14px;
+    font-size: 0.85rem; color: var(--accent); margin-bottom: 6px; text-align: left; line-height: 1.4;
+}
+.auth-invite-banner .icon { width: 18px; height: 18px; flex-shrink: 0; }
 .auth-hint { font-size: 0.8rem; color: var(--muted); text-align: center; line-height: 1.5; }
 .auth-error { font-size: 0.85rem; color: var(--danger); text-align: center; }
 .auth-switch {
@@ -243,6 +249,12 @@ kbd {
 .search-bar kbd { position: absolute; right: 9px; top: 50%; transform: translateY(-50%); pointer-events: none; }
 
 .user-chip { display: flex; align-items: center; gap: 8px; padding-left: 12px; border-left: 1px solid var(--line); }
+.workspace-select {
+    padding: 4px 8px; border-radius: 4px; border: 1px solid var(--line);
+    background: var(--card); color: var(--text); font-size: 0.82rem; font-family: var(--font-ui);
+    cursor: pointer; outline: none; max-width: 220px; text-overflow: ellipsis;
+}
+.workspace-select:focus-visible { border-color: var(--accent); }
 .user-badge {
     font-size: 0.75rem; font-weight: 600; padding: 4px 10px; border-radius: 4px;
     background: transparent; color: var(--warning); border: 1px solid var(--warning);
@@ -499,6 +511,38 @@ code[class*="language-"], pre[class*="language-"] { color: var(--text); text-sha
     margin: 0 !important; max-height: 220px; overflow: auto; font-size: 13px !important; line-height: 1.5 !important;
 }
 .vars-preview code { font-family: var(--font-mono) !important; text-shadow: none !important; }
+
+/* ==========================================================
+   EQUIPE E CONVITES
+   ========================================================== */
+.team-section { display: flex; flex-direction: column; gap: 8px; }
+.team-label { font-size: 0.88rem; font-weight: 600; color: var(--text); }
+.team-hint { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+.team-link-row { display: flex; gap: 8px; align-items: center; }
+.team-link-input {
+    flex: 1; padding: 10px 12px; background: var(--code); border: 1px solid var(--line);
+    border-radius: 4px; font-family: var(--font-mono); font-size: 0.82rem; color: var(--text);
+    outline: none; text-overflow: ellipsis;
+}
+.team-link-actions { margin-top: 4px; }
+.team-members-header { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+.team-count { font-size: 0.8rem; color: var(--muted); }
+.team-members-list {
+    display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto;
+    border: 1px solid var(--line); border-radius: 6px; padding: 6px; background: var(--card);
+}
+.team-member-item {
+    display: flex; justify-content: space-between; align-items: center; padding: 8px 12px;
+    border-radius: 4px; background: var(--bg); border: 1px solid var(--line); font-size: 0.85rem;
+}
+.team-member-info { display: flex; flex-direction: column; gap: 2px; }
+.team-member-email { font-weight: 500; color: var(--text); word-break: break-all; }
+.team-member-date { font-size: 0.75rem; color: var(--muted); }
+.team-member-badge {
+    font-size: 0.72rem; padding: 2px 6px; border-radius: 3px; background: var(--hover);
+    color: var(--accent); border: 1px solid var(--line); margin-left: 6px;
+}
+.team-empty { padding: 20px; text-align: center; color: var(--muted); font-size: 0.85rem; }
 
 /* ==========================================================
    TOAST
