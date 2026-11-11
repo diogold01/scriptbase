@@ -30,6 +30,14 @@ Comandos que contêm variáveis abrem uma janela de preenchimento antes da cópi
 
 ![Editor de Scripts e Histórico de Alterações](docs/screenshots/02-editor-script.png)
 
+## Colaboração em equipe
+
+Para equipes que trabalham lado a lado no atendimento, o ScriptBase permite compartilhar a biblioteca por link direto de convite, sem atrito de configuração.
+
+O proprietário da base gera um link exclusivo no botão Equipe e envia para os colegas de trabalho. Ao abrir o link, o colega entra na conta dele ou cria o cadastro na hora, sendo vinculado automaticamente ao espaço compartilhado.
+
+Com isso, todos os membros da equipe podem consultar, criar e editar scripts juntos. Cada alteração realizada registra automaticamente a data e o e-mail do autor no histórico de revisões do script, garantindo rastreabilidade sobre quem fez cada modificação. Pelo painel de gerenciamento, o proprietário visualiza quem já entrou e pode revogar acessos ou gerar um novo link de convite quando quiser.
+
 ## Uso de Inteligência Artificial
 
 A ferramenta utiliza inteligência artificial para acelerar a resolução de chamados sem colocar em risco dados sensíveis.
@@ -52,7 +60,7 @@ A interface utiliza o tema Livro-razão, pensado para rotinas de trabalho prolon
 
 O projeto foi construído de forma enxuta e sem processos pesados de compilação, o que facilita a leitura e a manutenção do código.
 
-O navegador roda HTML, CSS e JavaScript puro. No modo visitante, os dados ficam salvos exclusivamente no armazenamento local da máquina. Na conta conectada, as informações sincronizam com o Supabase, utilizando PostgreSQL protegido por regras de segurança por linha, onde cada pessoa acessa somente os próprios registros. As consultas de inteligência artificial passam por uma função no servidor da Vercel para comunicar com o Google Gemini sem expor chaves públicas no navegador.
+O navegador roda HTML, CSS e JavaScript puro. No modo visitante, os dados ficam salvos exclusivamente no armazenamento local da máquina. Na conta conectada, as informações sincronizam com o Supabase, utilizando PostgreSQL protegido por regras de segurança por linha (RLS), permitindo a colaboração entre proprietários e membros autorizados da equipe com isolamento total dos dados. As consultas de inteligência artificial passam por uma função no servidor da Vercel para comunicar com o Google Gemini sem expor chaves públicas no navegador.
 
 ## Como executar localmente
 
