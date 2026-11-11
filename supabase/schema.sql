@@ -25,10 +25,15 @@ create index if not exists scripts_tags_gin on public.scripts using gin (tags);
 create table if not exists public.teams (
   id          uuid primary key default gen_random_uuid(),
   owner_id    uuid not null unique references auth.users(id) on delete cascade,
-  invite_code text not null unique default encode(gen_random_bytes(16), 'hex'),
+  owner_email text not null default '',
+  invite_code text not null unique default replace(gen_random_uuid()::text, '-', ''),
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now()
 );
+
+-- Garante as colunas e padrão caso a tabela já tenha sido criada
+alter table public.teams add column if not exists owner_email text not null default '';
+alter table public.teams alter column invite_code set default replace(gen_random_uuid()::text, '-', '');
 
 create index if not exists teams_owner_idx on public.teams (owner_id);
 create index if not exists teams_invite_code_idx on public.teams (invite_code);
@@ -53,7 +58,7 @@ returns boolean
 language sql
 stable
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
   select exists (
     select 1
@@ -121,11 +126,12 @@ create or replace function public.get_or_create_my_team()
 returns jsonb
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
   v_team record;
   v_user_id uuid := auth.uid();
+  v_user_email text := auth.jwt() ->> 'email';
 begin
   if v_user_id is null then
     raise exception 'Não autenticado';
@@ -133,9 +139,13 @@ begin
 
   select * into v_team from public.teams where owner_id = v_user_id;
   if not found then
-    insert into public.teams (owner_id, invite_code)
-    values (v_user_id, encode(gen_random_bytes(16), 'hex'))
+    insert into public.teams (owner_id, owner_email, invite_code)
+    values (v_user_id, coalesce(v_user_email, ''), replace(gen_random_uuid()::text, '-', ''))
     returning * into v_team;
+  elsif v_team.owner_email = '' and v_user_email is not null and v_user_email <> '' then
+    update public.teams
+       set owner_email = v_user_email
+     where id = v_team.id;
   end if;
 
   return jsonb_build_object(
@@ -152,20 +162,23 @@ create or replace function public.regenerate_invite_code()
 returns text
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
-  v_new_code text := encode(gen_random_bytes(16), 'hex');
+  v_new_code text := replace(gen_random_uuid()::text, '-', '');
   v_user_id uuid := auth.uid();
+  v_user_email text := auth.jwt() ->> 'email';
 begin
   if v_user_id is null then
     raise exception 'Não autenticado';
   end if;
 
-  insert into public.teams (owner_id, invite_code)
-  values (v_user_id, v_new_code)
+  insert into public.teams (owner_id, owner_email, invite_code)
+  values (v_user_id, coalesce(v_user_email, ''), v_new_code)
   on conflict (owner_id) do update
-    set invite_code = v_new_code, updated_at = now();
+    set invite_code = v_new_code,
+        owner_email = coalesce(nullif(excluded.owner_email, ''), public.teams.owner_email),
+        updated_at = now();
 
   return v_new_code;
 end;
@@ -176,13 +189,12 @@ create or replace function public.join_team(p_invite_code text)
 returns jsonb
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
   v_team record;
   v_user_id uuid := auth.uid();
-  v_user_email text;
-  v_owner_email text;
+  v_user_email text := auth.jwt() ->> 'email';
 begin
   if v_user_id is null then
     raise exception 'Você precisa estar logado para aceitar o convite.';
@@ -197,20 +209,17 @@ begin
     return jsonb_build_object('status', 'owner', 'team_id', v_team.id);
   end if;
 
-  select email into v_user_email from auth.users where id = v_user_id;
-  select email into v_owner_email from auth.users where id = v_team.owner_id;
-
   insert into public.team_members (team_id, user_id, email, joined_at)
   values (v_team.id, v_user_id, coalesce(v_user_email, ''), now())
   on conflict (team_id, user_id) do update
     set joined_at = now(),
-        email = coalesce(excluded.email, public.team_members.email);
+        email = coalesce(nullif(excluded.email, ''), public.team_members.email);
 
   return jsonb_build_object(
     'status', 'joined',
     'team_id', v_team.id,
     'owner_id', v_team.owner_id,
-    'owner_email', coalesce(v_owner_email, 'Proprietário')
+    'owner_email', coalesce(nullif(v_team.owner_email, ''), 'Proprietário')
   );
 end;
 $$;
@@ -226,12 +235,11 @@ returns table (
 )
 language sql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
-  select tm.id, tm.user_id, coalesce(nullif(tm.email, ''), u.email, 'Colaborador') as email, tm.joined_at, tm.role
+  select tm.id, tm.user_id, coalesce(nullif(tm.email, ''), 'Colaborador') as email, tm.joined_at, tm.role
     from public.team_members tm
     join public.teams t on t.id = tm.team_id
-    left join auth.users u on u.id = tm.user_id
    where t.owner_id = auth.uid()
    order by tm.joined_at desc;
 $$;
@@ -241,7 +249,7 @@ create or replace function public.remove_team_member(p_member_id uuid)
 returns boolean
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 begin
   delete from public.team_members tm
@@ -264,16 +272,15 @@ returns table (
 )
 language sql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
   select t.id as team_id,
          t.owner_id,
-         coalesce(u.email, 'Proprietário') as owner_email,
+         coalesce(nullif(t.owner_email, ''), 'Proprietário') as owner_email,
          tm.joined_at,
          tm.role
     from public.team_members tm
     join public.teams t on t.id = tm.team_id
-    left join auth.users u on u.id = t.owner_id
    where tm.user_id = auth.uid()
    order by tm.joined_at desc;
 $$;
@@ -283,7 +290,7 @@ create or replace function public.leave_team(p_team_id uuid)
 returns boolean
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 begin
   delete from public.team_members
@@ -298,7 +305,7 @@ create or replace function public.increment_script_use(p_id uuid)
 returns public.scripts
 language sql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
   update public.scripts
      set use_count = use_count + 1
