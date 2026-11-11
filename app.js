@@ -558,8 +558,9 @@
     function closeOverlay(o) { o.classList.remove('active'); }
 
     function topOverlay() {
-        for (const id of ['varsOverlay', 'aiOverlay', 'editorOverlay']) {
-            if ($(id).classList.contains('active')) return id;
+        for (const id of ['varsOverlay', 'aiOverlay', 'teamOverlay', 'editorOverlay']) {
+            const o = $(id);
+            if (o && o.classList.contains('active')) return id;
         }
         return null;
     }
@@ -723,12 +724,15 @@
         const isEdit = !!state.editor.id;
         let logs = state.editor.logs;
 
+        const authorEmail = (ScriptStore.currentUser && ScriptStore.currentUser.email) ? ScriptStore.currentUser.email : '';
+        const authorSuffix = authorEmail ? ` (${authorEmail})` : '';
+
         if (isEdit) {
             const reason = prompt('O que você alterou? (resumo para o histórico)', '');
             if (reason === null) return;
-            logs = [...logs, { date: now, msg: reason.trim() ? 'Editado: ' + reason.trim() : 'Atualização de rotina' }];
+            logs = [...logs, { date: now, msg: (reason.trim() ? 'Editado: ' + reason.trim() : 'Atualização de rotina') + authorSuffix }];
         } else {
-            logs = [{ date: now, msg: 'Script criado' }];
+            logs = [{ date: now, msg: 'Script criado' + authorSuffix }];
         }
 
         const script = {
@@ -749,7 +753,7 @@
         const btn = $('btnSave');
         btn.disabled = true;
         try {
-            await ScriptStore.save(script);
+            await ScriptStore.save(script, authorEmail);
             await refresh();
             state.editor.snapshot = captureEditor();
             closeEditor();
@@ -959,6 +963,239 @@
     }
 
     /* ==========================================================
+       EQUIPE E CONVITES
+       ========================================================== */
+    function checkUrlInvite() {
+        try {
+            const params = new URLSearchParams(window.location.search);
+            const code = params.get('convite');
+            if (code) {
+                sessionStorage.setItem('scriptbase_pending_invite', code.trim());
+                if ($('authInviteBanner')) $('authInviteBanner').hidden = false;
+                return code.trim();
+            }
+        } catch (_) {}
+        const saved = sessionStorage.getItem('scriptbase_pending_invite');
+        if (saved && $('authInviteBanner')) $('authInviteBanner').hidden = false;
+        return saved;
+    }
+
+    async function openTeamModal() {
+        openOverlay($('teamOverlay'));
+        const linkInput = $('teamInviteLink');
+        const list = $('teamMembersList');
+        const currentWs = ScriptStore.activeWorkspace;
+
+        if (currentWs) {
+            $('teamTitle').textContent = `Equipe de ${currentWs.ownerEmail}`;
+            const linkSec = $('teamInviteLink').closest('.team-section');
+            if (linkSec) linkSec.hidden = true;
+            $('teamMembersCount').textContent = 'Colaborador';
+            list.replaceChildren(
+                el('div', { class: 'team-member-item' },
+                    el('div', { class: 'team-member-info' },
+                        el('div', { class: 'team-member-email', text: `Proprietário: ${currentWs.ownerEmail}` }),
+                        el('div', { class: 'team-member-date', text: 'Você tem permissão para visualizar, criar e editar scripts nesta biblioteca.' })
+                    ),
+                    el('button', {
+                        type: 'button',
+                        class: 'btn btn-outline btn-sm btn-danger',
+                        text: 'Sair da equipe',
+                        onclick: async () => {
+                            if (!confirm(`Deseja sair da equipe de ${currentWs.ownerEmail}?`)) return;
+                            try {
+                                await Team.leaveTeam(currentWs.teamId);
+                                toast('Você saiu da equipe.');
+                                closeTeamModal();
+                                ScriptStore.setActiveWorkspace(null);
+                                await setupWorkspaces();
+                                await refresh();
+                            } catch (e) {
+                                toast(e.message || 'Erro ao sair da equipe.', 'error');
+                            }
+                        }
+                    })
+                )
+            );
+            return;
+        }
+
+        // Modo dono da equipe
+        $('teamTitle').textContent = 'Compartilhar com a equipe';
+        const linkSec = $('teamInviteLink').closest('.team-section');
+        if (linkSec) linkSec.hidden = false;
+        linkInput.value = 'Carregando link...';
+        list.replaceChildren(el('div', { class: 'team-empty', text: 'Carregando membros...' }));
+
+        try {
+            const team = await Team.getMyTeam();
+            if (team && team.invite_code) {
+                const url = new URL(window.location.href);
+                url.search = `?convite=${encodeURIComponent(team.invite_code)}`;
+                linkInput.value = url.toString();
+            } else {
+                linkInput.value = 'Não foi possível carregar o link.';
+            }
+            await refreshTeamMembers();
+        } catch (err) {
+            toast(err.message || 'Erro ao carregar dados da equipe.', 'error');
+            linkInput.value = '';
+        }
+    }
+
+    function closeTeamModal() {
+        closeOverlay($('teamOverlay'));
+    }
+
+    async function refreshTeamMembers() {
+        const list = $('teamMembersList');
+        const count = $('teamMembersCount');
+        try {
+            const members = await Team.getMembers();
+            count.textContent = members.length === 1 ? '1 membro' : `${members.length} membros`;
+
+            if (!members.length) {
+                list.replaceChildren(
+                    el('div', { class: 'team-empty', text: 'Nenhum colega entrou ainda. Compartilhe o link acima.' })
+                );
+                return;
+            }
+
+            list.replaceChildren(
+                ...members.map((m) => {
+                    const info = el(
+                        'div',
+                        { class: 'team-member-info' },
+                        el('div', { class: 'team-member-email', text: m.email || 'Colaborador' }),
+                        el('div', { class: 'team-member-date', text: `Entrou em ${formatDate(m.joined_at)}` })
+                    );
+                    const removeBtn = el('button', {
+                        type: 'button',
+                        class: 'btn btn-outline btn-sm',
+                        text: 'Remover',
+                        onclick: async () => {
+                            if (!confirm(`Deseja remover o acesso de ${m.email}?`)) return;
+                            try {
+                                await Team.removeMember(m.id);
+                                toast('Acesso removido com sucesso.');
+                                await refreshTeamMembers();
+                            } catch (e) {
+                                toast(e.message || 'Erro ao remover membro.', 'error');
+                            }
+                        }
+                    });
+                    return el('div', { class: 'team-member-item' }, info, removeBtn);
+                })
+            );
+        } catch (_) {
+            list.replaceChildren(
+                el('div', { class: 'team-empty', text: 'Não foi possível carregar a lista de membros.' })
+            );
+        }
+    }
+
+    async function setupWorkspaces() {
+        const select = $('workspaceSelect');
+        const badge = $('userBadge');
+        if (!select) return;
+
+        // Processa convite pendente se houver
+        const pendingInvite = sessionStorage.getItem('scriptbase_pending_invite');
+        if (pendingInvite) {
+            try {
+                const res = await Team.joinTeam(pendingInvite);
+                sessionStorage.removeItem('scriptbase_pending_invite');
+                try {
+                    const cleanUrl = window.location.origin + window.location.pathname;
+                    window.history.replaceState({}, document.title, cleanUrl);
+                } catch (_) {}
+                if (res.status === 'joined') {
+                    toast(`Convite aceito! Bem-vindo à equipe de ${res.owner_email}.`);
+                    ScriptStore.setActiveWorkspace({
+                        ownerId: res.owner_id,
+                        ownerEmail: res.owner_email,
+                        teamId: res.team_id,
+                        role: 'editor'
+                    });
+                } else if (res.status === 'owner') {
+                    toast('Você é o dono desta equipe.');
+                }
+            } catch (err) {
+                toast(err.message || 'Não foi possível aceitar o convite.', 'error');
+                sessionStorage.removeItem('scriptbase_pending_invite');
+            }
+        }
+
+        // Consulta equipes ativas vinculadas ao usuário
+        let activeTeams = [];
+        try {
+            activeTeams = await Team.getMyActiveTeams();
+        } catch (_) {}
+
+        if (!activeTeams.length) {
+            select.hidden = true;
+            badge.textContent = 'Minha Biblioteca';
+            badge.classList.add('owner');
+            return;
+        }
+
+        select.hidden = false;
+        select.replaceChildren(
+            el('option', { value: 'personal', text: 'Minha Biblioteca' }),
+            ...activeTeams.map((t) =>
+                el('option', {
+                    value: `team_${t.team_id}`,
+                    text: `Equipe: ${t.owner_email}`,
+                    dataset: { ownerId: t.owner_id, ownerEmail: t.owner_email, teamId: t.team_id, role: t.role }
+                })
+            )
+        );
+
+        // Se há um workspace ativo ou salvo anteriormente
+        const currentWs = ScriptStore.activeWorkspace;
+        const savedWs = sessionStorage.getItem('scriptbase_active_ws');
+        const targetVal = currentWs ? `team_${currentWs.teamId}` : (savedWs || (activeTeams.length ? `team_${activeTeams[0].team_id}` : 'personal'));
+
+        const optToSelect = select.querySelector(`option[value="${targetVal}"]`);
+        if (optToSelect) select.value = targetVal;
+
+        select.onchange = async () => {
+            const val = select.value;
+            sessionStorage.setItem('scriptbase_active_ws', val);
+            if (val === 'personal') {
+                ScriptStore.setActiveWorkspace(null);
+                badge.textContent = 'Minha Biblioteca';
+            } else {
+                const opt = select.selectedOptions[0];
+                const ws = {
+                    ownerId: opt.dataset.ownerId,
+                    ownerEmail: opt.dataset.ownerEmail,
+                    teamId: opt.dataset.teamId,
+                    role: opt.dataset.role
+                };
+                ScriptStore.setActiveWorkspace(ws);
+                badge.textContent = `Equipe (${ws.ownerEmail.split('@')[0]})`;
+            }
+            await refresh();
+        };
+
+        if (select.value !== 'personal') {
+            const opt = select.selectedOptions[0];
+            if (opt && opt.dataset.ownerId) {
+                ScriptStore.setActiveWorkspace({
+                    ownerId: opt.dataset.ownerId,
+                    ownerEmail: opt.dataset.ownerEmail,
+                    teamId: opt.dataset.teamId,
+                    role: opt.dataset.role
+                });
+                badge.textContent = `Equipe (${opt.dataset.ownerEmail.split('@')[0]})`;
+            }
+        } else {
+            badge.textContent = 'Minha Biblioteca';
+        }
+    }
+
+    /* ==========================================================
        ENTRADA / SAÍDA
        ========================================================== */
     function showAuthError(msg) {
@@ -982,6 +1219,16 @@
         badge.textContent = mode === 'visitor' ? 'Visitante' : 'Conectado';
         badge.classList.toggle('owner', mode === 'owner');
 
+        const btnTeam = $('btnTeam');
+        if (btnTeam) btnTeam.hidden = mode !== 'owner';
+
+        if (mode === 'owner') {
+            await setupWorkspaces();
+        } else {
+            const select = $('workspaceSelect');
+            if (select) select.hidden = true;
+        }
+
         state.filterTag = 'Todas';
         state.search = '';
         $('searchInput').value = '';
@@ -994,12 +1241,18 @@
     async function logout() {
         try { await Auth.signOut(); } catch (_) { /* ignora */ }
         Session.clear();
-        ['varsOverlay', 'aiOverlay', 'editorOverlay'].forEach((id) => closeOverlay($(id)));
+        sessionStorage.removeItem('scriptbase_active_ws');
+        ['varsOverlay', 'aiOverlay', 'teamOverlay', 'editorOverlay'].forEach((id) => closeOverlay($(id)));
+        const btnTeam = $('btnTeam');
+        if (btnTeam) btnTeam.hidden = true;
+        const select = $('workspaceSelect');
+        if (select) { select.hidden = true; select.replaceChildren(); }
         state.scripts = [];
         state.mode = null;
         $('appShell').hidden = true;
         $('authScreen').hidden = false;
         showAuthError('');
+        checkUrlInvite();
     }
 
     /* ==========================================================
@@ -1178,6 +1431,32 @@
             doCopy(out, scriptId, missing.length ? `Copiado, mas ${missing.length} variável(is) ficaram sem valor.` : 'Código copiado com os valores!');
         });
 
+        // Equipe
+        $('btnTeam').addEventListener('click', openTeamModal);
+        $('btnTeamClose').addEventListener('click', closeTeamModal);
+        $('teamOverlay').addEventListener('mousedown', (e) => { if (e.target === e.currentTarget) closeTeamModal(); });
+
+        $('btnCopyTeamLink').addEventListener('click', async () => {
+            const link = $('teamInviteLink').value;
+            if (!link) return;
+            const ok = await copyText(link);
+            if (ok) toast('Link de convite copiado!');
+            else toast('Não foi possível copiar o link.', 'error');
+        });
+
+        $('btnRegenerateLink').addEventListener('click', async () => {
+            if (!confirm('Gerar um novo link irá invalidar o link anterior para quem ainda não entrou. Deseja continuar?')) return;
+            try {
+                const newCode = await Team.regenerateInviteCode();
+                const url = new URL(window.location.href);
+                url.search = `?convite=${encodeURIComponent(newCode)}`;
+                $('teamInviteLink').value = url.toString();
+                toast('Novo link gerado com sucesso!');
+            } catch (e) {
+                toast(e.message || 'Erro ao gerar novo link.', 'error');
+            }
+        });
+
         // Clique no fundo escuro fecha o modal
         $('editorOverlay').addEventListener('mousedown', (e) => { if (e.target === e.currentTarget) requestCloseEditor(); });
         $('aiOverlay').addEventListener('mousedown', (e) => { if (e.target === e.currentTarget) closeAi(); });
@@ -1193,6 +1472,7 @@
                     e.preventDefault();
                     if (top === 'varsOverlay') closeVars();
                     else if (top === 'aiOverlay') closeAi();
+                    else if (top === 'teamOverlay') closeTeamModal();
                     else requestCloseEditor();
                     return;
                 }
@@ -1275,6 +1555,8 @@
     $('authHint').textContent = Auth.isConfigured()
         ? 'Entre com seu e-mail e senha.'
         : 'Aguardando configuração de banco de dados.';
+
+    checkUrlInvite();
 
     (async () => {
         const saved = Session.get();

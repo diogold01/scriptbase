@@ -1,10 +1,9 @@
 /* ==========================================================
    ScriptBase | storage.js
-   Camada de dados + autenticação.
-   A interface (app.js) só conversa com ScriptStore e Auth.
-   Hoje: modo visitante em localStorage.
-   Depois: trocar/adicionar o adaptador do Supabase aqui,
-   sem mexer na interface.
+   Camada de dados, autenticação e equipe.
+   A interface (app.js) só conversa com ScriptStore, Auth e Team.
+   Suporta modo visitante (localStorage) e modo sincronizado
+   com Supabase (biblioteca pessoal ou biblioteca de equipe).
    ========================================================== */
 (() => {
     'use strict';
@@ -128,9 +127,18 @@
             async list() {
                 return read() || [];
             },
-            async save(script) {
+            async save(script, authorEmail) {
                 const list = read() || [];
                 const item = normalize(script);
+                if (authorEmail) {
+                    const now = new Date().toISOString();
+                    const isNew = !list.some((x) => x.id === item.id);
+                    const msg = `${isNew ? 'Criado por' : 'Editado por'} ${authorEmail}`;
+                    const last = item.logs[item.logs.length - 1];
+                    if (!last || last.msg !== msg) {
+                        item.logs = [...item.logs, { date: now, msg }].slice(-MAX_LOGS);
+                    }
+                }
                 const i = list.findIndex((x) => x.id === item.id);
                 if (i >= 0) list[i] = item;
                 else list.push(item);
@@ -166,9 +174,12 @@
     const demoSeed = () => (window.DEMO_SCRIPTS || []).map(normalize);
     const visitorAdapter = createLocalAdapter(KEYS.visitor, demoSeed);
 
-    /* ---------- adaptador do Supabase (modo dono) ---------- */
+    /* ---------- adaptador do Supabase (modo autenticado: pessoal ou equipe) ---------- */
     const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     const BATCH_SIZE = 50;
+
+    let currentUser = null;
+    let activeWorkspace = null; // null = pessoal; { ownerId, ownerEmail, teamId, role } = equipe
 
     function fail(error, msg) {
         console.error('[ScriptBase] Supabase:', error);
@@ -192,11 +203,11 @@
         });
     }
 
-    // Não envia user_id: o banco preenche com auth.uid().
-    // Ids que não são UUID (backups antigos) ganham um UUID novo.
-    function toRow(script) {
+    // Se houver um dono de equipe definido, grava com o ID do dono.
+    // Caso contrário, deixa o banco preencher com auth.uid().
+    function toRow(script, targetUserId) {
         const s = normalize(script);
-        return {
+        const row = {
             id: UUID_RE.test(s.id) ? s.id : newId(),
             title: s.title,
             error_text: s.errorText,
@@ -210,6 +221,10 @@
             created_at: s.createdAt,
             updated_at: s.updatedAt
         };
+        if (targetUserId) {
+            row.user_id = targetUserId;
+        }
+        return row;
     }
 
     function createSupabaseAdapter() {
@@ -218,20 +233,40 @@
         return {
             async init() {},
             async list() {
-                const { data, error } = await table().select('*').order('updated_at', { ascending: false });
+                let query = table().select('*');
+                if (activeWorkspace && activeWorkspace.ownerId) {
+                    query = query.eq('user_id', activeWorkspace.ownerId);
+                } else if (currentUser && currentUser.id) {
+                    query = query.eq('user_id', currentUser.id);
+                }
+                const { data, error } = await query.order('updated_at', { ascending: false });
                 if (error) throw fail(error, 'Não foi possível carregar os scripts.');
                 return (data || []).map(fromRow);
             },
-            async save(script) {
+            async save(script, authorEmail) {
+                const s = normalize(script);
+                const email = authorEmail || (currentUser && currentUser.email) || '';
+                if (email) {
+                    const now = new Date().toISOString();
+                    const isNew = !s.logs.length && (!s.createdAt || s.createdAt === s.updatedAt);
+                    const msg = `${isNew ? 'Criado por' : 'Editado por'} ${email}`;
+                    const last = s.logs[s.logs.length - 1];
+                    if (!last || last.msg !== msg) {
+                        s.logs = [...s.logs, { date: now, msg }].slice(-MAX_LOGS);
+                    }
+                }
+                const targetUserId = (activeWorkspace && activeWorkspace.ownerId) || (currentUser && currentUser.id) || null;
+                const row = toRow(s, targetUserId);
                 const { data, error } = await table()
-                    .upsert(toRow(script), { onConflict: 'id' })
+                    .upsert(row, { onConflict: 'id' })
                     .select()
                     .single();
                 if (error) throw fail(error, 'Não foi possível salvar o script.');
                 return fromRow(data);
             },
             async upsertMany(items) {
-                const rows = items.map(toRow);
+                const targetUserId = (activeWorkspace && activeWorkspace.ownerId) || (currentUser && currentUser.id) || null;
+                const rows = items.map((x) => toRow(x, targetUserId));
                 for (let i = 0; i < rows.length; i += BATCH_SIZE) {
                     const { error } = await table().upsert(rows.slice(i, i + BATCH_SIZE), { onConflict: 'id' });
                     if (error) throw fail(error, 'Não foi possível importar os scripts.');
@@ -265,10 +300,18 @@
         normalize,
         newId,
         get mode() { return currentMode; },
+        get currentUser() { return currentUser; },
+        get activeWorkspace() { return activeWorkspace; },
 
-        async init(mode) {
+        setActiveWorkspace(ws) {
+            activeWorkspace = ws || null;
+        },
+
+        async init(mode, workspace = null) {
             if (mode === 'visitor') {
                 adapter = visitorAdapter;
+                currentUser = null;
+                activeWorkspace = null;
             } else if (mode === 'owner') {
                 if (!window.Auth.isConfigured()) throw new Error('A conexão com o banco precisa estar configurada.');
                 let session = null;
@@ -279,6 +322,11 @@
                     throw fail(e, 'Não foi possível conectar ao Supabase.');
                 }
                 if (!session) throw new Error('Sessão expirada. Entre novamente.');
+                currentUser = {
+                    id: session.user.id,
+                    email: session.user.email || ''
+                };
+                activeWorkspace = workspace;
                 adapter = ownerAdapter;
             } else {
                 throw new Error('Modo de acesso inválido.');
@@ -288,7 +336,7 @@
         },
 
         list: () => ensure().list(),
-        save: (script) => ensure().save(script),
+        save: (script, authorEmail) => ensure().save(script, authorEmail),
         upsertMany: (items) => ensure().upsertMany(items),
         remove: (id) => ensure().remove(id),
         incrementUse: (id) => ensure().incrementUse(id),
@@ -309,7 +357,24 @@
             if (!this.isConfigured()) return null;
             try {
                 const { data } = await getClient().auth.getSession();
-                return data && data.session ? 'owner' : null;
+                if (data && data.session) {
+                    currentUser = {
+                        id: data.session.user.id,
+                        email: data.session.user.email || ''
+                    };
+                    return 'owner';
+                }
+                return null;
+            } catch (e) {
+                console.error('[ScriptBase] Supabase:', e);
+                return null;
+            }
+        },
+        async getUser() {
+            if (!this.isConfigured()) return null;
+            try {
+                const { data } = await getClient().auth.getUser();
+                return (data && data.user) || null;
             } catch (e) {
                 console.error('[ScriptBase] Supabase:', e);
                 return null;
@@ -333,6 +398,13 @@
                 }
                 throw fail(err, 'E-mail ou senha incorretos.');
             }
+            if (result.data && result.data.user) {
+                currentUser = {
+                    id: result.data.user.id,
+                    email: result.data.user.email || ''
+                };
+            }
+            return result.data;
         },
         async signUp(email, password) {
             if (!this.isConfigured()) {
@@ -362,6 +434,12 @@
                 }
                 throw fail(err, msg || 'Não foi possível cadastrar a conta.');
             }
+            if (result.data && result.data.user) {
+                currentUser = {
+                    id: result.data.user.id,
+                    email: result.data.user.email || ''
+                };
+            }
             return result.data;
         },
         async signOut() {
@@ -370,7 +448,62 @@
                 await getClient().auth.signOut();
             } catch (e) {
                 console.error('[ScriptBase] Supabase:', e);
+            } finally {
+                currentUser = null;
+                activeWorkspace = null;
             }
+        }
+    };
+
+    /* ---------- Team (Operações de Equipe e Convites) ---------- */
+    window.Team = {
+        async getMyTeam() {
+            if (!window.Auth.isConfigured()) return null;
+            const { data, error } = await getClient().rpc('get_or_create_my_team');
+            if (error) throw fail(error, 'Não foi possível carregar os dados da equipe.');
+            return data;
+        },
+        async regenerateInviteCode() {
+            if (!window.Auth.isConfigured()) return null;
+            const { data, error } = await getClient().rpc('regenerate_invite_code');
+            if (error) throw fail(error, 'Não foi possível gerar novo link de convite.');
+            return data;
+        },
+        async joinTeam(inviteCode) {
+            if (!window.Auth.isConfigured()) throw new Error('Serviço de autenticação não configurado.');
+            const { data, error } = await getClient().rpc('join_team', { p_invite_code: inviteCode });
+            if (error) {
+                const msg = error.message || '';
+                if (/inválido|expirado/i.test(msg)) {
+                    throw fail(error, 'Convite inválido ou expirado.');
+                }
+                throw fail(error, msg || 'Não foi possível entrar na equipe.');
+            }
+            return data;
+        },
+        async getMembers() {
+            if (!window.Auth.isConfigured()) return [];
+            const { data, error } = await getClient().rpc('get_team_members');
+            if (error) throw fail(error, 'Não foi possível listar os membros da equipe.');
+            return data || [];
+        },
+        async removeMember(memberId) {
+            if (!window.Auth.isConfigured()) return false;
+            const { data, error } = await getClient().rpc('remove_team_member', { p_member_id: memberId });
+            if (error) throw fail(error, 'Não foi possível remover o membro da equipe.');
+            return data;
+        },
+        async getMyActiveTeams() {
+            if (!window.Auth.isConfigured()) return [];
+            const { data, error } = await getClient().rpc('get_my_active_teams');
+            if (error) throw fail(error, 'Não foi possível consultar as equipes.');
+            return data || [];
+        },
+        async leaveTeam(teamId) {
+            if (!window.Auth.isConfigured()) return false;
+            const { data, error } = await getClient().rpc('leave_team', { p_team_id: teamId });
+            if (error) throw fail(error, 'Não foi possível sair da equipe.');
+            return data;
         }
     };
 })();
