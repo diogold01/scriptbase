@@ -460,13 +460,13 @@
         async getMyTeam() {
             if (!window.Auth.isConfigured()) return null;
             const { data, error } = await getClient().rpc('get_or_create_my_team');
-            if (error) throw fail(error, 'Não foi possível carregar os dados da equipe.');
+            if (error) throw fail(error, error.message || 'Não foi possível carregar os dados da equipe.');
             return data;
         },
         async regenerateInviteCode() {
             if (!window.Auth.isConfigured()) return null;
             const { data, error } = await getClient().rpc('regenerate_invite_code');
-            if (error) throw fail(error, 'Não foi possível gerar novo link de convite.');
+            if (error) throw fail(error, error.message || 'Não foi possível gerar novo link de convite.');
             return data;
         },
         async joinTeam(inviteCode) {
@@ -484,25 +484,25 @@
         async getMembers() {
             if (!window.Auth.isConfigured()) return [];
             const { data, error } = await getClient().rpc('get_team_members');
-            if (error) throw fail(error, 'Não foi possível listar os membros da equipe.');
+            if (error) throw fail(error, error.message || 'Não foi possível listar os membros da equipe.');
             return data || [];
         },
         async removeMember(memberId) {
             if (!window.Auth.isConfigured()) return false;
             const { data, error } = await getClient().rpc('remove_team_member', { p_member_id: memberId });
-            if (error) throw fail(error, 'Não foi possível remover o membro da equipe.');
+            if (error) throw fail(error, error.message || 'Não foi possível remover o membro da equipe.');
             return data;
         },
         async getMyActiveTeams() {
             if (!window.Auth.isConfigured()) return [];
             const { data, error } = await getClient().rpc('get_my_active_teams');
-            if (error) throw fail(error, 'Não foi possível consultar as equipes.');
+            if (error) throw fail(error, error.message || 'Não foi possível consultar as equipes.');
             return data || [];
         },
         async leaveTeam(teamId) {
             if (!window.Auth.isConfigured()) return false;
             const { data, error } = await getClient().rpc('leave_team', { p_team_id: teamId });
-            if (error) throw fail(error, 'Não foi possível sair da equipe.');
+            if (error) throw fail(error, error.message || 'Não foi possível sair da equipe.');
             return data;
         }
     };
