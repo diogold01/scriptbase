@@ -9,23 +9,13 @@ dados_usuario/
 *.token
 *.key
 
-# Backups e dados reais
+# Backups e dados locais
 *.json.bak
 backup*.json
 scripts_reais*.json
 
-# Instruções locais de IA e rascunhos
-GLOBAL_RULES.md
-GEMINI.md
-CLAUDE.md
-rules.md
-context.md
-PROMPT_*.md
-referencias/
-.gemini/
-.brain/
-.claude/
-
-# Sistema operacional
+# Sistema operacional e editores
 .DS_Store
 Thumbs.db
+.vscode/
+.idea/
