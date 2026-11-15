@@ -1,12 +1,12 @@
 # ScriptBase
 
-Biblioteca web colaborativa para organização, busca e preparação de scripts SQL antes de copiar em rotinas de suporte técnico a sistemas ERP, com diagnóstico de erros assistido por inteligência artificial.
+Biblioteca web colaborativa para organização, busca e preparação de scripts SQL antes de copiar em rotinas de suporte técnico a sistemas ERP, com diagnóstico de erros assistido por **RAG (Retrieval-Augmented Generation)** e API Google Gemini.
 
 Aplicação no ar: https://scriptbase-gules.vercel.app
 
-> Acesse como visitante para testar imediatamente com dados de demonstração.
+> Acesse como visitante para testar imediatamente com dados de demonstração ou clique em **Diagnosticar erro (RAG)** no topo para consultar a base fiscal/ERP.
 
-![Visão Geral do ScriptBase](docs/screenshots/01-visao-geral-claro.png)
+![Diagnóstico de Erro com RAG e Fontes Citadas](docs/screenshots/05-diagnostico-ia.png)
 
 ## O Problema
 
@@ -43,9 +43,16 @@ O ScriptBase centraliza esse acervo em uma ferramenta de bancada simples e padro
 
 ![Editor de Scripts e Histórico de Alterações](docs/screenshots/02-editor-script.png)
 
-![Diagnóstico de Erro com Inteligência Artificial](docs/screenshots/05-diagnostico-ia.png)
-
 ## Como a IA e o RAG Funcionam
+
+```mermaid
+flowchart LR
+    A[Erro do ERP / Fiscal] --> B[Retrieval: Base ERP 106 chunks]
+    A --> C[Metadados dos Scripts SQL]
+    B --> D[Prompt Fundamentado - Gemini]
+    C --> D
+    D --> E[Diagnóstico + Fontes Citadas]
+```
 
 A integração com a API do Google Gemini (via função serverless em `api/ai.js`) atua em duas frentes independentes:
 
