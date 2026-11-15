@@ -45,18 +45,18 @@ O ScriptBase centraliza esse acervo em uma ferramenta de bancada simples e padro
 
 ![Diagnóstico de Erro com Inteligência Artificial](docs/screenshots/05-diagnostico-ia.png)
 
-## Como a IA Funciona
+## Como a IA e o RAG Funcionam
 
 A integração com a API do Google Gemini (via função serverless em `api/ai.js`) atua em duas frentes independentes:
 
-- **Diagnóstico de erros (`AI.diagnose`):** recebe a mensagem de erro informada pelo analista e a lista de títulos, descrições, tags e erros conhecidos da equipe para indicar qual script resolve o caso e explicar o motivo em linguagem direta, sem enviar o código SQL completo das consultas.
+- **Diagnóstico com RAG (`AI.diagnose`):** ao receber uma mensagem de erro ou sintoma fiscal, o backend executa primeiro a recuperação (*retrieval*) dos trechos mais relevantes na base de conhecimento ERP (`data/erp_errors_kb.json`, com 106 registros de erros e resoluções higienizados) combinando correspondência exata de código fiscal/SEFAZ e pontuação lexical ponderada. Em seguida, injeta os trechos recuperados e os metadados dos scripts SQL do usuário (sem enviar o código SQL) no prompt do Gemini, que sintetiza a causa provável, o passo a passo e cita as fontes utilizadas.
 - **Sugestão de metadados (`AI.suggest`):** ao cadastrar ou documentar um script, analisa até 2.000 caracteres do comando SQL para sugerir título, descrição resumida e tags padronizadas.
-- **Contingência local (`ai.js`):** se a chave de API não estiver configurada ou o serviço externo falhar, o sistema recorre automaticamente a um motor local que pontua os scripts por palavras-chave e expressões regulares.
+- **Contingência local (`ai.js`):** se a chave de API não estiver configurada ou o serviço externo falhar, o sistema executa localmente a mesma busca sobre `data/erp_errors_kb.json` e sobre os scripts da biblioteca.
 
 ## Limites Atuais
 
 - A aplicação não conecta nem executa comandos diretamente no banco de dados do ERP; ela prepara, valida variáveis e copia a consulta para o analista executar no gerenciador do banco.
-- A busca e o diagnóstico operam sobre os metadados e textos cadastrados (ainda sem busca vetorial/RAG com embeddings).
+- A etapa de recuperação (RAG) utiliza busca híbrida por código exato e termos ponderados em memória sobre `data/erp_errors_kb.json` (não depende de extensão vetorial ativa no runtime, mantendo o schema opcional `supabase/schema_rag.sql` para futura migração para `pgvector`).
 - O endpoint `/api/ai` utiliza cadeia de fallback entre modelos rápidos do Gemini, mas ainda não possui controle próprio de *rate limit* por usuário.
 
 ## Stack

@@ -55,13 +55,75 @@
         return found.filter((t) => t.length >= 3 && !STOPWORDS.has(t));
     }
 
+    /* ---------- base de conhecimento ERP local (fallback RAG) ---------- */
+    let cachedLocalKb = null;
+
+    async function loadLocalKb() {
+        if (cachedLocalKb) return cachedLocalKb;
+        if (location.protocol === 'file:') return [];
+        try {
+            const res = await fetch('./data/erp_errors_kb.json');
+            if (!res.ok) return [];
+            const data = await res.json();
+            cachedLocalKb = Array.isArray(data) ? data : [];
+            return cachedLocalKb;
+        } catch (_) {
+            return [];
+        }
+    }
+
+    function localRetrieveKb(errorText, kb, topK = 4) {
+        if (!kb.length) return [];
+        const qNorm = norm(errorText);
+        const qTokens = [...new Set(tokens(errorText))];
+        if (!qTokens.length) return [];
+
+        const scored = [];
+        kb.forEach((doc) => {
+            let score = 0;
+            const codeNorm = norm(doc.code);
+            if (codeNorm && codeNorm.length >= 2) {
+                const codeRx = new RegExp(`(^|[^a-z0-9])${codeNorm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([^a-z0-9]|$)`);
+                if (codeRx.test(qNorm)) score += 12;
+            }
+            const titleSet = new Set(tokens(doc.title));
+            const solSet = new Set(tokens(doc.solution));
+            const titleNorm = norm(doc.title);
+            const solNorm = norm(doc.solution);
+
+            qTokens.forEach((t) => {
+                if (titleSet.has(t)) score += 3.2;
+                else if (titleNorm.includes(t)) score += 2.0;
+                if (solSet.has(t)) score += 1.5;
+                else if (solNorm.includes(t)) score += 0.8;
+            });
+
+            if (score >= 2.5) {
+                scored.push({
+                    id: String(doc.id || ''),
+                    code: String(doc.code || ''),
+                    title: String(doc.title || ''),
+                    category: String(doc.category || 'Geral ERP'),
+                    solution: String(doc.solution || ''),
+                    relevance: Math.min(0.99, Number((score / 18).toFixed(2))),
+                    cited: false,
+                    citationReason: '',
+                    score
+                });
+            }
+        });
+
+        scored.sort((a, b) => b.score - a.score);
+        return scored.slice(0, topK).map(({ score, ...rest }) => rest);
+    }
+
     /* ---------- diagnóstico local ---------- */
-    function localDiagnose(errorText, scripts) {
+    async function localDiagnose(errorText, scripts) {
         const query = [...new Set(tokens(errorText))];
         const queryNorm = norm(errorText);
         const ranked = [];
 
-        scripts.forEach((s) => {
+        (scripts || []).forEach((s) => {
             const inError = new Set(tokens(s.errorText));
             const inTitle = new Set(tokens(s.title));
             const inDesc = new Set(tokens(s.description));
@@ -100,12 +162,23 @@
         ranked.sort((a, b) => b.score - a.score);
         const matches = ranked.slice(0, 3).map(({ id, confidence, reason }) => ({ id, confidence, reason }));
 
+        const kb = await loadLocalKb();
+        const ragSources = localRetrieveKb(errorText, kb, 4);
+
+        let summary = 'Nenhum script ou registro parecido encontrado na base. Que tal cadastrar este erro com a solução?';
+        if (matches.length && ragSources.length) {
+            summary = `Encontrei ${ragSources.length} registro(s) na base de erros ERP e ${matches.length} script(s) relacionados.`;
+        } else if (ragSources.length) {
+            summary = `Encontrei ${ragSources.length} registro(s) correspondentes na base de conhecimento ERP (modo offline).`;
+        } else if (matches.length) {
+            summary = `Encontrei ${matches.length} script(s) com termos parecidos com o erro. Confira antes de rodar.`;
+        }
+
         return {
             source: 'local',
-            summary: matches.length
-                ? `Encontrei ${matches.length} script(s) com termos parecidos com o erro. Confira antes de rodar.`
-                : 'Nenhum script parecido na sua base. Que tal cadastrar este erro com a solução?',
-            matches
+            summary,
+            matches,
+            ragSources
         };
     }
 
@@ -160,9 +233,9 @@
 
     /* ---------- validação das respostas da API ---------- */
     function cleanDiagnosis(data, scripts) {
-        if (!data || !Array.isArray(data.matches)) return null;
-        const ids = new Set(scripts.map((s) => s.id));
-        const matches = data.matches
+        if (!data || (!Array.isArray(data.matches) && !Array.isArray(data.ragSources))) return null;
+        const ids = new Set((scripts || []).map((s) => s.id));
+        const matches = (Array.isArray(data.matches) ? data.matches : [])
             .filter((x) => x && ids.has(String(x.id)))
             .slice(0, 5)
             .map((x) => ({
@@ -170,10 +243,24 @@
                 reason: typeof x.reason === 'string' ? x.reason.slice(0, 400) : '',
                 confidence: Math.max(0, Math.min(1, Number(x.confidence) || 0))
             }));
+        const ragSources = (Array.isArray(data.ragSources) ? data.ragSources : [])
+            .filter((r) => r && r.title && r.solution)
+            .slice(0, 5)
+            .map((r) => ({
+                id: String(r.id || ''),
+                code: String(r.code || ''),
+                title: String(r.title).slice(0, 180),
+                category: String(r.category || 'Geral ERP').slice(0, 40),
+                solution: String(r.solution).slice(0, 1200),
+                relevance: Math.max(0, Math.min(1, Number(r.relevance) || 0)),
+                cited: Boolean(r.cited),
+                citationReason: typeof r.citationReason === 'string' ? r.citationReason.slice(0, 300) : ''
+            }));
         return {
             source: 'ai',
-            summary: typeof data.summary === 'string' ? data.summary.slice(0, 800) : '',
-            matches
+            summary: typeof data.summary === 'string' ? data.summary.slice(0, 1200) : '',
+            matches,
+            ragSources
         };
     }
 
@@ -195,7 +282,7 @@
         // scripts: [{ id, title, description, errorText, tags }]  (o código SQL não é enviado)
         async diagnose(errorText, scripts) {
             const data = await callApi({ task: 'diagnose', error: errorText, scripts });
-            return cleanDiagnosis(data, scripts) || localDiagnose(errorText, scripts);
+            return cleanDiagnosis(data, scripts) || (await localDiagnose(errorText, scripts));
         },
 
         async suggest(code, existingTags) {

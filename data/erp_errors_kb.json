@@ -1,0 +1,744 @@
+[
+  {
+    "id": "erp-001",
+    "code": "",
+    "title": "ERRO PARTE YBR630",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: essa mensagem de erro ocorre porque o arquivo NFe_Update_022021, não foi yextraído na pasta PROGRAMA do computador que esta querendo gerar a NFE"
+  },
+  {
+    "id": "erp-002",
+    "code": "328",
+    "title": "ERRO 328 - NÃO TEM FINALIDADE DE DEVOLUÇÃO Venda de mercadoria 70regime de substituição tributária",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: essa mensagem de erro ocorre porque não foi informado a chave de acesso no campo {chave referenciada} na hora da emissão de nfe de devolução.."
+  },
+  {
+    "id": "erp-003",
+    "code": "386",
+    "title": "ERRO 386 - CFOP NAO PERMITIDO PARA O CSOSN",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção 1: essa mensagem de erro ocorre quando o CSOSN não está compatível com CFOP (verificar o CFOP do produto, caso tiver a tributação 060 o CFOP precisa ser o 5405 e o CSOSN 500, caso tiver 000, CFOP 5102 CSOSN 102)"
+  },
+  {
+    "id": "erp-004",
+    "code": "531",
+    "title": "ERRO 531 AO GERAR NFe ou NFCe: Total da BC ICMS difere do somatório dos itens",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO OPÇÃO 1 ->: verificar se a CFOP está compatível com a tributação do produto, incluindo a CSOSN;\nCORREÇÃO OPÇÃO 2 ->: Realizar a configuração conforme as instruções descritas no manual, para habilitar a emissão de nota fiscal com destaque do valor de Substituição Tributária (ST) para empresas do Simples Nacional. (consultar manual interno)\nCORREÇÃO OPÇÃO 3 -> verificar se a empresa destaca icms, se for do simples nacional ajustar a natureza."
+  },
+  {
+    "id": "erp-005",
+    "code": "qCom",
+    "title": "ERRO - qCom - com valor ‘-1’",
+    "category": "Geral ERP",
+    "solution": "Correção: essa mensagem de erro ocorre quando vai emitir uma nota fiscal e no pedido tem um produto com a quantidade {-1} no produto."
+  },
+  {
+    "id": "erp-006",
+    "code": "354",
+    "title": "ERRO - 354 - Informado grupo de devolução de tributos para NF-e que não tem finalidade de correção",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: esta mensagem de erro ocorre quando o cliente não referencia a chave da nota fiscal em que irá devolver"
+  },
+  {
+    "id": "erp-007",
+    "code": "355",
+    "title": "ERRO 355 - informar o local de saída do PAÍS no caso da exportação",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: essa mensagem de erro ocorre quando o cliente Utiliza o CFOP 7501 tem que preencher os campos de {UF/local Embarque(Exportação)}, {CHAVE DE NFE RECEBIDA PARA EXPORTAÇÃO}."
+  },
+  {
+    "id": "erp-008",
+    "code": "uCom",
+    "title": "ERRO :PROD - ESPERANDO - uCom",
+    "category": "Geral ERP",
+    "solution": "Correção: essa mensagem de erro ocorre quando o produto está sem a informação UNIDADE ou no pedido o campo UNIDADE esteja em branco sem informação."
+  },
+  {
+    "id": "erp-009",
+    "code": "",
+    "title": "ERRO - ISSNETONLINE\\OutputRetConsLote.txt",
+    "category": "Geral ERP",
+    "solution": "Correção: essa mensagem de erro ocorre quando a pasta NFSe - está corrompida.\nProcedimento: Renomeei a pasta antiga para NFSe1 e extrai novamente a pasta nfse022021."
+  },
+  {
+    "id": "erp-010",
+    "code": "",
+    "title": "ERRO DTD - O Arquivo contém 1 ou mais erros node Validação DTD ICMS40",
+    "category": "Fiscal / NF-e",
+    "solution": "Erro ao Enviar emissão de NFe ao Enviar, mensagem adicional: O arquivo contém 1 ou mais erros node validação de esquema de acordo com o DTD ou esquema, o conteúdo do elemento '{http\\://www.portalfiscal.inf.br/nfe}ICMS40' esta incompleto. Esperado: {http\\://www.portalfiscal.inf.br}motDesICMS.\nCorreção: Ir na tabela recursos → campo CBENEF - coloca uma data para frete, pois o MS não destaca ainda. Isso não vale para emitente do RJ e PR {CASO O EMISSOR SEJA O PR OU RJ TEM QUE PREENCHER } nos campo das imagens abaixo. {Produto ou Natureza} e Config Tributária."
+  },
+  {
+    "id": "erp-011",
+    "code": "",
+    "title": "ERRO NFE PELA FICHA DO CLIENTE - foram encontrados pedidos abertos em outro Terminais.",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: Rodar o seguinte script update pedidos set data_af \\= null where id_cliente \\= x"
+  },
+  {
+    "id": "erp-012",
+    "code": "",
+    "title": "ERRO ao carregar Arquivo nfeConfig.ini",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: Verificar o cadastro da Região que no cadastro da empresa emissora, se está correto , {o motivo desse erro e que }"
+  },
+  {
+    "id": "erp-013",
+    "code": "232",
+    "title": "ERRO 232 - Rejeição: IE do destinatário não informado",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: Verificar o cadastro do cliente, se o campo INSCRIÇÃO ESTADUAL está preenchido corretamente."
+  },
+  {
+    "id": "erp-014",
+    "code": "703",
+    "title": "ERRO 703 - Rejeição: Data-hora de emissão posterior ao horário de recebimento.",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: Verificar a data e hora do computador e o fuso horário se estão correto no horário do estado emissor."
+  },
+  {
+    "id": "erp-015",
+    "code": "297",
+    "title": "ERRO 297 Rejeição: Assinatura difere do calculado",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: Verificar os campos, CLIENTE, PRODUTOS, IMPOSTO, *SE CASO NAO LOCALIZAR NEM UM ERRO CRIAR UM NOVO CADASTRO DE PRODUTO E CLIENTE E REALIZAR UMA NOVA VENDA.*\n*SUGESTÃO 2= SIMULAR EMISSÃO DE UMA NFCE PODENDO ASSIM VISUALIZAR O CAMPO QUE ESTÁ COM ERRO.*\n*Sugestão 3: Analisar os dados do cliente, inserir o nome do cliente novamente, adicionar novamente a IE sem pontos ou traços, adicionar o nome abreviado*"
+  },
+  {
+    "id": "erp-016",
+    "code": "",
+    "title": "RELATÓRIO",
+    "category": "Sistema / Periféricos",
+    "solution": "Correção: Verificar a impressora se tem alguma impressora definida como padrão."
+  },
+  {
+    "id": "erp-017",
+    "code": "537",
+    "title": "ERRO 537 Rejeição: Total do Desconto difere do somatório dos itens",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: 1-> Clicar no pedido com botão direito {*outras opções -> Atualizar o valor unitário para 2 casas decimais.*} ou fazer a segunda opção.\n2-> Quando o desconto é muito pequeno, menos de 1 Real jogar o desconto somente em 1 item.\n*den*"
+  },
+  {
+    "id": "erp-018",
+    "code": "NCM",
+    "title": "ERRO Validação de esquema : NCM com valor ‘0’",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: Ajustar o cadastro do produto que está com ncm \\= 0, colocar um ncm válido no produto."
+  },
+  {
+    "id": "erp-019",
+    "code": "",
+    "title": "ERRO O diretório para salvar logs, e invalido NFCE\\Log\\",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: Extrarir a pasta {NFCe_Update_022021.zip}, dentro da pasta programa."
+  },
+  {
+    "id": "erp-020",
+    "code": "748",
+    "title": "ERRO 748 Rejeição: NF-e sem grupo do COFINS (não é um valor de ponto flutuante válido).",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: OPÇÃO 1-> VERIFIQUEI NO CADASTRO DO PRODUTO SE O PRODUTO ESTAVA COM ALÍQUOTA DE COFINS\nOPÇÃO 2 -> NO CADASTRO DE NATUREZA DE OPERAÇÃO A OPÇÃO DE CALCULAR - *PIS/COFINS DEIXAR COMO NÃO*\n*CORREÇÃO DO ERRO AJUSTADO A PARTIR DA VERSÃO ERP 3.0.1.884*"
+  },
+  {
+    "id": "erp-021",
+    "code": "",
+    "title": "ERRO O Campo [nro_E07] referente a [número] deve ser preenchido",
+    "category": "Cadastro",
+    "solution": "Correção: opção 1 -> Verificar o Cadastro do Cliente se o Campo número de endereço está preenchido.\nopção 2 -> verificar se o Cadastro da Propriedade está com o campo número preenchido."
+  },
+  {
+    "id": "erp-022",
+    "code": "798",
+    "title": "ERRO 798 Rejeição: NF-e sem grupo do COFINS",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: opção 1 -> Verificar em UTILITÁRIO -> CONFIGURAÇÃO TRIBUTÁRIA, se o estado do destinatário da NFE está cadastrado em partilha de ICMS e o FCP está com valor ZERO.\nopção 2 -> verificar se o cadastro do produto está marcado a opção {enviar partilha de ICMS}"
+  },
+  {
+    "id": "erp-023",
+    "code": "",
+    "title": "ERRO pCredSN - não é esperado, conteúdo do elemento pai {ICMSSN900} - vICMS",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: opção 1 -> verificar no pedido as colunas {CST \\+ TRIBUTAÇÃO \\+ CSOSN} se estão compatíveis.. conferir a regra do CSOSN no link.\n[CSOSN: Para que serve esse código e como usá-lo corretamente?](https://elevesuasvendas.com.br/blog/legislacao-fiscal/csosn#:~:text=O%20CSOSN%20serve%20para%20identificar,sobre%20as%20mercadorias%20que%20vende).\n*não é esperado*"
+  },
+  {
+    "id": "erp-024",
+    "code": "CSOSN",
+    "title": "ERRO CSOSN - não é esperado, conteúdo do elemento pai {ICMSSN900} - Orig",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: opção 1 -> verificar no pedido o produtos ou natureza de operação se os campos estão corretamente preenchidos o sistema está acusando que o campo ORIGEM da mercadoria está em BRANCO."
+  },
+  {
+    "id": "erp-025",
+    "code": "",
+    "title": "ERRO tPag_YA02 - [ meio de pagamento ]",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: opção 1 -> no cadastro da espécie de pagamento verificar se o campo {ID NFE/NFCE}, está preenchido corretamente."
+  },
+  {
+    "id": "erp-026",
+    "code": "100",
+    "title": "ERRO QpedidosItens - não foi possível abrir a tabela. { DESCRICAO }, esperando 100 atual 60.",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: opção 1 -> abrir o banco de DADOS no IBExPert, ir na tabela Produtos selecionar a coluna DESCRICAO clicar com o botão direito do mouse, {Edit Field DESCRICAO} -> {Edit Domain} ->\n{Length \\= 100} -> OK -> OK.CEST"
+  },
+  {
+    "id": "erp-027",
+    "code": "01",
+    "title": "ERRO O arquivo contém 1 ou mais erros de validação de esquema '01.999.' viola a restrição pattern de '[0-9]{7}'. - CEST' com valor '01.999.'",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: opção 1 -> Cadastro do produto verificar o campo CEST, está com o valor incorreto, não pode conter carácter especial é tem que conter 7 dígitos como ex{2806300}."
+  },
+  {
+    "id": "erp-028",
+    "code": "318",
+    "title": "ERRO 318 Rejeição: ContraNota de Produtor sem NOTA FISCAL REFERENCIADA",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: opção 1 -> Sempre que o cliente for emitir uma nota fiscal de entrada, e o cliente for um produtor rural o SEFAZ irá fazer essa rejeição se não referenciar a NFP Nota de Produtor."
+  },
+  {
+    "id": "erp-029",
+    "code": "",
+    "title": "ERRO: O Sistema encontrou NFCe pendente de confirmação anterior a Data atual",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: opção 1 -> Verificar na guia ESTOQUE->FISCAL se tem algum NFCe em VERDE ou AZUL,\nVERDE-> selecionar a NFCE visualizar e clicar em CONFIRMAR\nAZUL-> Selecionar a NFCE visualizar e clicar na linha VERMELHA para enviar a NFE em contingência."
+  },
+  {
+    "id": "erp-030",
+    "code": "850",
+    "title": "850 Rejeição: Data de vencimento da parcela no informada…. {nOcor:002}",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: Datas de pagamento invertidas ( colocou uma futura parcela primeiro e o valor a ser pago de entrada após) Ajustar as data de vencimento com a espécie de pagamento"
+  },
+  {
+    "id": "erp-031",
+    "code": "",
+    "title": "Rejeição: A data do evento não pode ser menor que a data de autenticação da NF-E ou MDF-E ou CT-E",
+    "category": "MDF-e",
+    "solution": "Correção: opção 1 -> verificar se a DATA do computador está correta.\nopção 2 -> verificar o FUSO HORÁRIO do computador tem que estar (UTC-04:00)CUIABÁ para o servidor de MS é (UTC-03:00)BRASILIA"
+  },
+  {
+    "id": "erp-032",
+    "code": "778",
+    "title": "778 Rejeição: Informado NCM inexistente{nitem:1}",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: opção 1 -> verificar o NCM vinculado ao produto se ainda existe na tabela de NCM no dia 31/03/2022 foi desativados vários NCM.\nopção 2 -> caso seja um NCM novo e ainda nao consta da tabela de NCM ([http\\://download.ERP.com.br/Util/ncm_ibpt_ms/]([servidor de atualizações]) ), rodar o script para inserir a nova tabela."
+  },
+  {
+    "id": "erp-033",
+    "code": "",
+    "title": "Erro: validação de esquema { cMun }, não é esperado de acordo com modelo do conteúdo {enderDest}, {xCpl},{xBairro}",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: opção 1 -> verificar o cadastro da Cidade se o campo código do Município IBGE está preenchido, e se a cidade do cliente está vinculada ao ESTADO UF correto.\nCSTORI"
+  },
+  {
+    "id": "erp-034",
+    "code": "209",
+    "title": "209 Rejeição: IE do emitente invalida",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: opção 1 -> verificar no SINTEGRA se o cadastro do cliente EMITENTE está ativo e habilitado.\nopção 2 -> verificar se o cadastro do CLIENTE{ utilitários -> configurações gerais -> dados da empresa -> região } está na cidade correta com o estado CORRETO."
+  },
+  {
+    "id": "erp-035",
+    "code": "508",
+    "title": "508 Rejeição: CST incompatível na operação com NÃO Contribuinte[nItem:2]",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: opção 1 -> Verificar se CST e o CFOP do produto estão compatíveis com a tabela CST verificar no link ([CSOSN: Para que serve esse código e como usá-lo corretamente?](https://elevesuasvendas.com.br/blog/legislacao-fiscal/csosn#:~:text=O%20CSOSN%20serve%20para%20identificar,sobre%20as%20mercadorias%20que%20vende))"
+  },
+  {
+    "id": "erp-036",
+    "code": "45",
+    "title": "ERRO:Trying to store a string of length 45 into a field that can only contain 30",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: opção 1 -> Erro na importação do XML, tem que desmarcar a opção de CADASTRAR o fornecedor na hora a importação, porque não está compatível com o sistema os campo do fornecedor, o cliente vai ter que realizar o cadastro do fornecedor após a importação do XML."
+  },
+  {
+    "id": "erp-037",
+    "code": "629",
+    "title": "629 Rejeição: Valor do produto difere do produto valor unitário de comercialização e quantidade comercial.",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: OPÇÃO 1 -> Erro ocorre nas casas decimais na hora da emissão da nfe, para corrigir clique com botão direito no pedido (outras opções -> atualizar o valor unitário para 2 casas decimais), após isso realizar a emissão da Nota Fiscal."
+  },
+  {
+    "id": "erp-038",
+    "code": "667",
+    "title": "667 Rejeição: Quantidade informada no grupo de totalizadores não confere com a quantidade de documentos relacionados.",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: OPÇÃO 1 -> Verificar se o número de {MUNICÍPIOS DE DESCARREGAMENTO} está com o mesmo número de DOCUMENTOS FISCAIS RELACIONADOS. EXEMPLO: {CIDADES: DOURADOS / CAMPO GRANDE} os documentos relacionados tenho que ter pelo menos 1 documento de cada cidade.\nOPÇÃO 2-> Excluir todos os {documentos fiscais relacionados} que foram anexados, fechar o ERP transporte e anexar novamente os documentos."
+  },
+  {
+    "id": "erp-039",
+    "code": "",
+    "title": "Erro de HTTP : codigo 75782 - (ERROR_SSL_HANDSHAKE_FAILURE) incompatible. certificate is provided and has an associated private key",
+    "category": "Certificado Digital",
+    "solution": "Correção: OPÇÃO 1 -> Verifique se o certificado está instalado corretamente caso o certificado seja TOKEN ou CARTÃO pedir para o cliente remover o certificado e conectar de novo .\nOPÇÃO 2 -> Se o certificado for A1 remover o certificado e realizar uma nova instalação."
+  },
+  {
+    "id": "erp-040",
+    "code": "",
+    "title": "Erro DTD ou esquema o conteúdo do elemento - veicTransp está incompleto {esperando: UF}",
+    "category": "Geral ERP",
+    "solution": "Correção: OPÇÃO 1 -> Na emissão da nota fiscal eletrônica quando preenchido a placa do VEÍCULO no campo de transportadora tem que preencher o estado da placa do VEÍCULO."
+  },
+  {
+    "id": "erp-041",
+    "code": "539",
+    "title": "539 Rejeição: Duplicidade de NF-e ou NFC-e com diferença na chave de Acesso.",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: OPÇÃO 1 -> Verificar se a chave informada no na rejeição se refere a venda no qual está sendo emitido a nfe ou nfce pela consulta de nfe e nfce através do site. caso seja referente a venda realizar o cancelamento do documento pelo utilitário e depois avançar a sequência no número da NFE ou NFCE e emitir outro documento.\nOPÇÃO 2 -> Verificar se a chave informada no na rejeição se refere a venda no qual está sendo emitido a nfe ou nfce pela consulta de nfe e nfce através do site. Caso a chave não se refira ao pedido Realizar somente o avanço da sequência numérica e emitir a nfe ou nfce"
+  },
+  {
+    "id": "erp-042",
+    "code": "920",
+    "title": ">>Correção: OPÇÃO 1 -> erro ocorre quando o cliente vai emitir nfe pela entrega e a entrega e parcial, o sistema não realiza o cálculo da quantidade parcial, para emitir a NFE tem ",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: OPÇÃO 3 -> Verificar tributação está compatível com o CFOP, no item anterior informado no erro ( exear a tributação do produto se a trmplo: nitem:16, verificar o item 15) e na hora de emitir a nota fiscal pela ficha do cliente, selecionar os campo abaixos"
+  },
+  {
+    "id": "erp-044",
+    "code": "627",
+    "title": "627 Rejeição : O valor do ICMS desonerado deve ser informado [nitem:1] >>Correção: OPÇÃO 1 -> O erro ocorre na hora de emitir a nfe pela entrega, quando o campo alíquota de ICMS es",
+    "category": "Fiscal / NF-e",
+    "solution": "#NFE de EXPORTAÇÃO.\nPROCEDIMENTO:\nPASSO 1 -> UTILITÁRIOS -> CONFIGURAÇÕES ADICIONAIS -> MOSTRAR UNIDADES TRIBUTÁRIAS NOS ITENS DO PEDIDO \\= “SIM“.\nPASSO 2 -> NO PEDIDO VERIFICAR OS CAMPOS {UN.TRIB}{QTDE TRIB} {VALOR UN. TRIB.} SE ESTÁ APARECENDO CASO NÃO ESTEJA APARECENDO ESSAS COLUNAS NO PRODUTO, REALIZAR O SEGUINTE PASSO IR NO UTILITARIOS >>> 1- RESTAURAR DEFINIÇÕES DE TELA, 2-VERIFICAR TABELAS ABERTAS, 3-SAIR E ENTRAR NO SISTEMA.\nPASSO 3 -> UN TRIB. -> INFORMA A UNIDADE TRIBUTÁRIA REFERENTE AO NCM.\nQTDE TRIB. -> INFORMAR O PESO DO PRODUTO\nVALOR UN. TRIB. -> BOTÃO DIREITO NA TELA -> OUTRAS OPÇÕES -> CALCULAR VALOR UNITÁRIO TRIBUTÁVEL.\nPASSO 4 -> ANTES DE EMITIR A NFE SELECIONAR ESSA OPÇÃO\n#cStat: 817 unidade tributável incompatível com o ncm informado na operação com comercio exterior (nitem:1)\nCorreção: Este erro muitas vezes ocorre devido a unidade tributável da NCM não ser compatível com unidade de litro onde estava como ''L'', para ajustar foi preciso está alterando a unidade para KG e ajustar a quantidade da unidade após isso pode clicar novamente com o botão direito e recalcular o valor unitário tributável."
+  },
+  {
+    "id": "erp-045",
+    "code": "",
+    "title": "PDV -> Não é um valor de ponto flutuante válido >>Correção: OPÇÃO 1 -> Verificar no painel de controle, se a opção Idiomas e Regiões, os campo numérico SÍMBOLO DECIMAL está correto",
+    "category": "MDF-e",
+    "solution": "#ERRO NA EMISSÃO DE NF-e: IE é inválida dentro de MG\nCORREÇÃO: acrescentar dois zeros no início da inscrição estadual (Ex.: 00XXXXXX.XXX.XX)\n#ERRO NA EMISSÃO DE NF-e: erro relacionado a “tPag”\nCORREÇÃO: verificada no pedido, em específico a ID NFe/NFCe (cadastro > espécie de pagamento)\n#ERRO NA EMISSÃO DE MDF-e: rejeição por não haver município informado no documento anexado.\nCORREÇÃO: no ERP Transporte, na aba de anexar documentos fiscais do Manifesto Eletrônico, dar dois cliques no anexo e ajustar a opção “cidade”.\n#ERRO NA EMISSÃO DE NF-e: não informado o grupo de ICMS para a UF de destino cstat :694\nCORREÇÃO: verificar o cadastro do produto, na parte de impostos, a checkbox “*enviar partilha ICMS*” e marcá-la.\nVerificar a Configuração Tributária de acordo com a UF (utilitários - configuração tributária)"
+  },
+  {
+    "id": "erp-046",
+    "code": "00",
+    "title": "ERRO AO AJUSTAR VALOR NO PEDIDO: “0.00 não é um valor de ponto flutuante válido”",
+    "category": "Geral ERP",
+    "solution": "CORREÇÃO: verificar a configuração da moeda no próprio computador, ir em configurações adicionais e redefinir."
+  },
+  {
+    "id": "erp-047",
+    "code": "",
+    "title": "ERRO NA EMISSÃO DE NFE: NFe sem recibo",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO: verificar se o campo “unidade” do item selecionado no pedido está nulo."
+  },
+  {
+    "id": "erp-048",
+    "code": "999",
+    "title": "ERRO NA EMISSÃO DE NFE: 999 erro não catalogado",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO: SEFAZ em manutenção, aguardar o retorno."
+  },
+  {
+    "id": "erp-049",
+    "code": "",
+    "title": "ERRO NA EMISSÃO DE NFCE: “SinvalidContentType”",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO: verificar ID NFe e NFCe da espécie de pagamento utilizada no pedido."
+  },
+  {
+    "id": "erp-050",
+    "code": "00",
+    "title": "ERRO NA EMISSÃO DE NFCE: “pICMSInter com valor 0.00”",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO: se o produto for 040 (não tributado), desmarcar a checkbox de partilha ICMS no cadastro do produto (opção de impostos) e verificar se o ICMS interestadual está correto de acordo com o estado do destinatário."
+  },
+  {
+    "id": "erp-051",
+    "code": "",
+    "title": "ERRO AO CADASTRAR CLIENTE POR CNPJ AUTOMÁTICO: ‘’ ‘’ não é uma data válida",
+    "category": "Cadastro",
+    "solution": "CORREÇÃO: limite de consulta de cadastros foi ultrapassado. Verificar com a gerência ERP."
+  },
+  {
+    "id": "erp-052",
+    "code": "732",
+    "title": "ERRO AO GERAR NFE 732: CFOP de operação interestadual e idDest \\<>2",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO: caso na ficha do cliente esteja com a região interestadual correta, verificar se a opção de “Venda Interna Cons. Final” está marcada. Se estiver, desmarcar e tentar gerar a NFe novamente."
+  },
+  {
+    "id": "erp-053",
+    "code": "733",
+    "title": "ERRO 733 CFOP DE OPERAÇÃO INTERNA E IDDEST DIFERE DE 1",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO 1: VERIFICAR O CFOP que está sendo utilizado (nesta situação o cliente estava tentando gerar uma nota de devolução para fora do estado e estava com o cfop 1202, o correto é o 2202)\nCORREÇÃO 2: VERIFICAR A NATUREZA DE OPERAÇÃO, em algumas versões quando a natureza de operação está como remessa ocorre esse erro, nesse caso deve-se trocar para movimentação."
+  },
+  {
+    "id": "erp-054",
+    "code": "",
+    "title": "ERRO AO GERAR NFE: CMun com valor 0",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO: verificar se o código IBGE da região do cliente está preenchido. Se no cadastro do cliente existir propriedade associada, verificar também o código IBGE da região de tal propriedade."
+  },
+  {
+    "id": "erp-055",
+    "code": "",
+    "title": "ERRO AO PROCESSAR PEDIDO: O servidor de RPC não está disponível",
+    "category": "Cadastro",
+    "solution": "CORREÇÃO: abrir o Painel de Controle da máquina, pesquisar por Ferramentas Administrativas, abrir Serviços e verificar a opção de “Spooler de impressão”. Ele precisa estar em execução (se não estiver iniciado, clicar com o botão direito do mouse e iniciar o serviço) e com inicialização automática (clicar duas vezes no serviço para abrir as propriedades e ajustar a inicialização para automático)."
+  },
+  {
+    "id": "erp-056",
+    "code": "61",
+    "title": "ERRO AO GERAR NFCE: erro “61”",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO: verificar no Gerenciamento de Nota Fiscal do Consumidor Eletrônica se a opção “Versão esquema” está como “Pl_009k”, caso a empresa seja de gás que utilize a tributação 061."
+  },
+  {
+    "id": "erp-057",
+    "code": "",
+    "title": "ERRO AO GERAR NFSE: para este tomador só é permitido a emissão de notas fiscais com a situação tributária … Substituição Tributária …",
+    "category": "Cadastro",
+    "solution": "CORREÇÃO: ativar a opção de substituto no cadastro do cliente"
+  },
+  {
+    "id": "erp-058",
+    "code": "",
+    "title": "ERRO AO GERAR NFSE: Para essa cidade o campo referente a tag “CodigoItemListaServico” é obrigatório e não deve ser Maior que 5 Caracteres",
+    "category": "Geral ERP",
+    "solution": "CORREÇÃO: verificar em Gerenciamento de Nota Fiscal de Serviço se na aba de Serviços o CNAE e o C. Serviços estão invertidos.\n* CNAE: numeração com maiores dígitos;\n* C. Serviços: máximo 5 dígitos."
+  },
+  {
+    "id": "erp-059",
+    "code": "",
+    "title": "ERRO AO GERAR NFSE: Lote de RPS já enviado",
+    "category": "Geral ERP",
+    "solution": "CORREÇÃO: abrir Gerenciamento de Nota Fiscal de Serviço e ajustar opção de Controle de Lote para automático."
+  },
+  {
+    "id": "erp-060",
+    "code": "",
+    "title": "ERRO AO GERAR NFE CARREGAMENTO. ‘’cBarraTrib’’",
+    "category": "Fiscal / NF-e",
+    "solution": "has\nCORREÇÃO: Nota fiscal de exportação elas não enviam partilha de icms, caso consultar no produto e estiver marcada esta opção pode estar desmarcando ela e tentar emitir novamente a nota.\nObs: caso verifique e estiver desmarcada as caixinhas de envio de partilha, pode marcar ela e desmarcar, muitas vezes fica travada."
+  },
+  {
+    "id": "erp-061",
+    "code": "772",
+    "title": "Código 772: Rejeição - Operação Interestadual e UF de destino igual a UF de origem.",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: Quando a natureza da operação estiver definida como \"remessa\" e a emissão da nota fiscal ocorrer para um cliente cujo endereço de entrega está no mesmo estado do emissor, o SEFAZ irá emitir essa rejeição. Para resolver essa questão, é necessário alterar a opção de Operação para \"MOVIMENTAÇÃO\".\n*A opção \"remessa\" deve ser selecionada quando o cliente estiver localizado no mesmo estado que o emissor, mas o endereço de entrega for em outro estado.*"
+  },
+  {
+    "id": "erp-062",
+    "code": "610",
+    "title": "ERRO: 610 Total da NF difere do somatório dos valores que compõe o valor total da NF",
+    "category": "Geral ERP",
+    "solution": "Correção: Verificar o campo de ‘convênio’ tem que estar marcado como ‘sim’ para calcular o imposto."
+  },
+  {
+    "id": "erp-063",
+    "code": "13",
+    "title": "ERRO: Problematic key value is (“ID_EMPRESA”=1) At procedure ‘ESTATISTICA_DOC’ line:13, col:9",
+    "category": "Banco de Dados",
+    "solution": "Correção: Entrar no Ibexpert, selecionar a tabela ‘estatistica_doc’ ir em:\ne rodar o script que se encontra na pasta update.ERP.com.br - script-ESTATISTICA_DOC.sql"
+  },
+  {
+    "id": "erp-064",
+    "code": "",
+    "title": "ERRO: Connection Closed Gracefully",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: verificar em utilitários - configurações gerais - módulos - e servidor SMTP, caso tiver padrão tem que alterar\n#ERRO: INTERNO - Can’t send mail all recipients were rejected: 554 5.7.1\nCorreção: 1° - conferir em configurações gerais se o email da empresa está correto, 2° verificar com o cliente se a senha do email foi trocada recente (se sim, alterar no plug boletos, informar a senha nova)\n#ERRO: ‘TituloinformacoesAdicionais’ Tamanho máximo do campo é 100 caracteres\nCorreção: Verificar a quantidade de caracteres que tem no campo ‘HISTÓRICO’ (fazer um teste recortando esses caracteres e tentar gerar o boleto sem esse histórico)\nexemplo:\n#ERRO: 441 Descrição do pagamento obrigatória para meio de pagamento 99-outros\nCorreção: cadastro - espécie de pagamento - consulta F9 - e selecione a espécie - em IDNFe/NFCe e insira o id de acordo com a espécie de pgto escolhida\nexemplo:"
+  },
+  {
+    "id": "erp-065",
+    "code": "",
+    "title": "ERRO: Erro ao consultar status do serviço: Não foi possível realizar a conezão com Servidor de Licença. Emitente xxxxxxxxx e software House: xxxxxxxx",
+    "category": "Cadastro",
+    "solution": "Correção 1 : Verificar se os dados do CNPJ do emitente estão corretos no ‘’UTILITARIOS’’ para melhor verificação, pode ser consultado no site da SINTEGRA e ver se está válido.\nCorreção 2 : Zipar a pasta programa de outro terminal que está funcionando e descompactar no servidor/terminal que esteja apresentando esse erro."
+  },
+  {
+    "id": "erp-066",
+    "code": "533",
+    "title": "ERRO 533: TOTAL DA BC ICMS-ST DIFERE DO SOMATÓRIO DOS ITENS (natureza de operação: devolução)",
+    "category": "Fiscal / NF-e",
+    "solution": "Correção: Verificar a natureza de operação utilizada na saída, verificar a tributação na natureza de operação"
+  },
+  {
+    "id": "erp-067",
+    "code": "",
+    "title": "ERRO(descrição null) Descrição dos Títulos, quando realizado a importação de contas de outro sistema, e a descrição estiver em branco.",
+    "category": "Cadastro",
+    "solution": "null\nCorreção: rodar o seguinte SCRIPT para ajustar.\n*update contas set update contas set descricao \\= substring((select clientes.nome from clientes where clientes.id_cliente \\= contas.id_cliente)from 1 for 50)*\n*where contas.descricao is null*"
+  },
+  {
+    "id": "erp-068",
+    "code": "",
+    "title": "ERRO (only one TIdAntiFreeze can exist per applicattion) na hora de enviar orçamento por e-mail",
+    "category": "Sistema / Periféricos",
+    "solution": "Correção: Fechar todo o sistema e abrir novamente o aplicativo de envio de email ficou travado, um dos motivos pode ser a oscilação da internet."
+  },
+  {
+    "id": "erp-069",
+    "code": "",
+    "title": "ERRO NO RELATÓRIO DE POSIÇÃO DE ESTOQUE: QUANTIDADES POR GRADE NÃO ESTÃO SENDO EXIBIDAS O relatório de posição de estoque está apresentando um erro, onde as quantidades de estoque ",
+    "category": "Cadastro",
+    "solution": "CORREÇÃO: Para ajustar o relatório, certifique-se de que a opção \"Utilizar Estoque por Departamento\" esteja configurada como \"Não\" é que a opção \"Gerenciar Estoque\" esteja desmarcada no cadastro de departamentos, especialmente quando a empresa estiver configurada como tipo Mono."
+  },
+  {
+    "id": "erp-071",
+    "code": "",
+    "title": "ERRO: Parte I05G não encontrada.",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO: Verificar na configuração da NFE e NFCE a versão da ESQUEMA selecionada, tem que alterar a versão ou extrair a versão update atualizada da nfce e nfe para voltar a funcionar."
+  },
+  {
+    "id": "erp-072",
+    "code": "",
+    "title": "ERRO: HÁ 1 ITEM(S) SEM TRIBUTAÇÃO OU ALÍQUOTA DE ICMS",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO: OPÇÃO 1: Verificar no cadastro do produto a Tributação e se tem a alíquota do ICMS, neste caso o campo de icms não estava preenchido, removemos o produto e inserimos novamente.\nOPÇÃO 2: Ajustar o campo do ICMS, informando um valor válido no caso tem que verificar o valor do ICMS que pode ser 0, 7, 12, 17."
+  },
+  {
+    "id": "erp-073",
+    "code": "881",
+    "title": "ERRO: 881 REJEIÇÃO: PERCENTUAL DE FCP ST IGUAL A ZERO",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO: Verificar em Utilitários - Configurações gerais - Fiscal - opções - Usar controle de FCP, está marcado com ‘sim’, caso esteja, marque ‘não’"
+  },
+  {
+    "id": "erp-074",
+    "code": "",
+    "title": "ERRO: Erro ao carregar ArquivosNFSeLocais, Erro ao visualizar as configurações da Nota fiscal de Serviço",
+    "category": "Cadastro",
+    "solution": "CORREÇÃO: Verificar a versão do componente instalado. Para versões anteriores ao ERP 3.0.2.395 utiliza a versão do componente (setup_nfse_dependencies_tecnoaccount_1.1.77.7451 - NFSeV2_Update_122023 )\nPara versões acima do ERP 3.0.2.406 utiliza a versão do componente\n(setup_nfse_dependencies_tecnoaccount_1.1.83.7537 - NFSeV2_Update_092024 )"
+  },
+  {
+    "id": "erp-075",
+    "code": "",
+    "title": "ERRO: #AUP403 …authentication rejected",
+    "category": "Cadastro",
+    "solution": "Esse erro ocorre quando o sistema não consegue identificar a impressora instalada no computador do cliente\nCORREÇÃO: Verificar se o serviço de Spooler está sendo executado, caso for preciso reinicie o serviço. Verificar também se tem uma impressora local instalada."
+  },
+  {
+    "id": "erp-076",
+    "code": "",
+    "title": "ERRO: …authentication error TODA301 Esse erro acontece quando o cliente está emitindo uma nfce/nfe ou quando está enviando o xml",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO: Verificar o email padrão do sistema, caso esteja o padrão, alterar para um provisório\n#ERRO: na emissão de nfe Sem Protocolo\ncStat: 209: IE do emitente invalida\nCORREÇÃO: Verificar do dados do cliente em utilitários (neste caso o cliente estava com a região divergente, cliente de Dourados MS, estava como Sarandi PR)"
+  },
+  {
+    "id": "erp-077",
+    "code": "",
+    "title": "ERRO: Nota fiscal de serviço (erro de validação de Script) SEMFAZ",
+    "category": "Cadastro",
+    "solution": "CORREÇÃO: Alterar o cadastro do cliente/fornecedor em ‘substituto’ colocar como sim.\nTodo serviço tem uma alíquota de ISS.\nTem alguns clientes que tem o Desconto do ISS, que no caso são os substitutos.\nE outros que não tem esse desconto, que no caso somam no serviço essa alíquota, que são os não substitutos\nEntão nesse caso, ao tentar gerar para esse cliente, a prefeitura faz a verificação e via que esse cliente tem que ser substituto, ter o desconto do iss, e estava tentando gerar sem ser substituto"
+  },
+  {
+    "id": "erp-078",
+    "code": "804",
+    "title": "ERRO:SQL error code \\= -804 - Count of read-write columns does not equal count of values",
+    "category": "Banco de Dados",
+    "solution": "CORREÇÃO: Verificar na coluna Quantidade de produtos, pois nessa situação o produto estava com a quantidade (80,21) [foi clonado o pedido e alterado manualmente, pois a funcionária só queria gerar as etiquetas]"
+  },
+  {
+    "id": "erp-079",
+    "code": "538",
+    "title": "ERRO: 538 rejeição total do IPI difere do somatório do itens",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO: 1 - Verificar o cadastro do produto se o campo [CST IPI SAÍDA] está como “*Tributado*”. “% IPI E/S”, está preenchido.\n2- verificar no cadastro da natureza de operação se o campo de CALCULAR IPI está “SIM”.\n3- se o produto estava sem o “CST IPI” informado corretamente você tem que excluir e lançar novamente o produto na venda para o sistema recalcular."
+  },
+  {
+    "id": "erp-080",
+    "code": "1824",
+    "title": "ERRO 1824: CÓDIGO INTERNO DO VEICULO {tamanho maior que o permitido} \\<veicReboque>",
+    "category": "Cadastro",
+    "solution": "CORREÇÃO: 1 - Verificar se nao foi inserido o veiculo no campo do reboque isso ocorre quando o cliente lança a mesma placa do veículo no campo do reboque, onde não permite que o campo do código interno cadastrado do veículo seja um campo de descrição como no exemplo do erro acima que a cliente cadastrou o veiculo e colocou o campo de código interno como {FIAT STRADA}, e só excluir a placa do campo reboque e tentar emitir novamente."
+  },
+  {
+    "id": "erp-081",
+    "code": "",
+    "title": "ERRO: violação a restrição pattern de { xProd }",
+    "category": "Geral ERP",
+    "solution": "CORREÇÃO: 1 - verificar a descrição do produto se não tem algum caracter especial, como no exemplo acima o produto está cadastrado com um caracter especial que não foi tratado para corrigir é só deletar ele e tentar emitir novamente a nota fiscal."
+  },
+  {
+    "id": "erp-082",
+    "code": "100",
+    "title": "ERRO QNFCEItem: DESCRIÇÃO esperando 100 atual 30.",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO: 1 - Para corrigir esse erro deve ser ajustado pelo IBEXPERT na tabela “NFCE_ITEM”, a coluna “DESCRICAO” deve ser alterada o tamanho do campo através do botão direito em cima do campo {edit field DESCRIÇÃO} -> {edit Domain} -> altera o campo {Length} para 100 e confirma."
+  },
+  {
+    "id": "erp-083",
+    "code": "230",
+    "title": "ERRO 230 : Rejeição : IE do emitente não cadastrada",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO: 1 - Esse erro ocorre quando a empresa não está cadastrada ou habilitada para realizar emissão da NFE neste caso específico ocorreu em uma empresa do estado MT, onde para realizar o homologação da empresa para emitir NFE deve ser realizado diretamente com a contabilidade. não havendo a necessidade de realizar o credenciamento igual do estado de MS."
+  },
+  {
+    "id": "erp-084",
+    "code": "203",
+    "title": "ERRO 203 : Rejeição : Emissor não habilitado para emissão da NF-e",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO: 1 - Entrar em contato com a contabilidade do cliente para ver se a empresa já está habilitada para emissão da NFE."
+  },
+  {
+    "id": "erp-085",
+    "code": "",
+    "title": "ERRO TSegCodBarra : Segundo Código de Barra - tamanho maior que o maximo permitido.",
+    "category": "Cadastro",
+    "solution": "CORREÇÃO: 1 - Cliente adicionou duas notas fiscais iguais, para corrigir foi necessário realizar a exclusão de uma nota fiscal, já que se tratava da mesma chave de acesso às duas notas fiscais."
+  },
+  {
+    "id": "erp-086",
+    "code": "693",
+    "title": "ERRO 693 : Rejeição: Alíquota de ICMS superior a definida para a operação Interestadual.",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO: 1 - Este ocorre quando o campo de ICMS está preenchido de forma errada, exemplo se for emitir uma nfe para o estado de SP o icms tem que ser 7% quando e uma remessa de devolução e se for uma venda tem que ser 12%, verificar para qual o estado e a nfe e verificar o ICMS válido no estado realizar o ajuste no cadastro do produto. ou pedido."
+  },
+  {
+    "id": "erp-087",
+    "code": "695",
+    "title": "ERRO 695: Rejeição: Informado indevidamente o grupo de ICMS para a UF de destino",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO: Desmarcar a opção de “Enviar partilha de ICMS” no cadastro do produto."
+  },
+  {
+    "id": "erp-088",
+    "code": "27",
+    "title": "ERRO: arithmetic exception, numeric overflow, or string truncation string right truncation At procedure ‘PROCESSAEMBARQUE’ line: 27, col: 5",
+    "category": "Geral ERP",
+    "solution": "CORREÇÃO: Verificar se o nº doc não está com um texto muito grande, se estiver tem que colocar algo menor no campo."
+  },
+  {
+    "id": "erp-089",
+    "code": "",
+    "title": "ERRO: motivo 00000-Erro de validação de script ( para este tomador só é permitida a emissão de nota fiscais com a situação tributária de Substituição Tributária )",
+    "category": "Cadastro",
+    "solution": "CORREÇÃO: Verificar o cadastro do cliente se a opção de “Substituto”, no cadastro do clientes está com SIM, é na hora de emitir a NFSE, colocar o tipo de emissão como substituto."
+  },
+  {
+    "id": "erp-090",
+    "code": "799",
+    "title": "ERRO 799 NA EMISSÃO DA NFE: REJEIÇÃO VALOR TOTAL DO ICMS INTERESTADUAL DA UF DE DESTINO DIFERE DO SOMATÓRIO DOS ITENS",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO: Verificar nas configurações tributárias se os dados do estado do cliente estão corretos"
+  },
+  {
+    "id": "erp-091",
+    "code": "612",
+    "title": "ERRO 612 GTIN da unidade tributavel (cEANTrib) invalido",
+    "category": "Geral ERP",
+    "solution": "CORREÇÃO: Verificar as configurações em utilitários -> geren. nota fiscal -> outros dados -> Enviar código de barra (se caso tiver marcado - desmarcar essa caixa e testar )"
+  },
+  {
+    "id": "erp-092",
+    "code": "853",
+    "title": "ERRO 853 Rejeição: Dados de cobrança não devem ser informados para pagamento à vista",
+    "category": "Fiscal / NF-e",
+    "solution": "600\nCORREÇÃO: Verificar a versão instalada no cliente, corrigido a partir da versão 3.0.2.600\n#ERRO: Campo pDevol_UA02 não encontrado\nCORREÇÃO: Verificar se a versão do componente instalado é compatível com a versão do sistema"
+  },
+  {
+    "id": "erp-093",
+    "code": "",
+    "title": "ERRO: O Arquivo de Impressão Modelo/Final está em aberto ou com Erro: Mensagem Adicional: Impossível criar arquivo “ “. A sintaxe do arquivo, do nome do diretório do rótulo do volu",
+    "category": "Sistema / Periféricos",
+    "solution": "CORREÇÃO: Verificar em Utilitários -> Configurações de arquivos de documentos -> LOCAL_PEDIDO está preenchido corretamente. Caso não tenha configurado, informar o caminho do pedido."
+  },
+  {
+    "id": "erp-094",
+    "code": "NCM",
+    "title": "ERRO: O Campo [NCM_I05] referente a [Codigo NCM] deve ser preenchido.",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO: Verificar todos os NCM’s do pedido, pode ocorrer de ter sido inativado e não estar atualizado com o novo. ( *caso validar essa atualização, verificar se tem outros produtos com esse ncm vinculado para rodar um script de atualização*.)"
+  },
+  {
+    "id": "erp-095",
+    "code": "",
+    "title": "ERRO: Falha na comunicação com WebService-\\<faultstring>org.apache.xerces.impl.io.MalformedByteSequenceException: Invalid Byte 1 of 1 - byte UTF-8 sequence.\\</faultstring>",
+    "category": "Geral ERP",
+    "solution": "1076t\nCORREÇÃO: Verificar na observação do pedido, pois deve conter algum caractere fantasma. (digitar em um bloco de notas e colar novamente)"
+  },
+  {
+    "id": "erp-096",
+    "code": "1073",
+    "title": "ERRO:1073 Rejeição: total do IS informado indevidamente",
+    "category": "Fiscal / NF-e",
+    "solution": "O produto não está associado a nem uma informação de tributação, referente a reforma tributária.\nerro ocorre apenas nas versões da reforma tributária\nCORREÇÃO: ajustar o cadastro do produto e vincular o produto na guia imposto, Tributação - selecionar uma tributação que esteja configurado a reforma tributária."
+  },
+  {
+    "id": "erp-097",
+    "code": "715",
+    "title": "ERRO: vIBS_UB54a não encontrado. O erro ocorre quando o sistema está atualizado para as versões da 715 ou superior, e não foi realizada a atualização da pasta Esquemas da nfe e nfc",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO: atualizar os componentes e extrair novamente a pasta schema para a data do MÊS 062026."
+  },
+  {
+    "id": "erp-099",
+    "code": "1118",
+    "title": "ERRO: 1118 Rejeição: Total de IBS e CBS informado indevidamente",
+    "category": "Fiscal / NF-e",
+    "solution": "1° Erro ocorre quando é realizado a emissão da NFCE da venda com as configurações de esquema diferente do “pl_010b”, e depois tenta emitir uma NFE de acobertamento com as configurações de da reforma tributária, o sistema dá essa rejeição.\n2° Quando for NF e verificar se os produtos estão com o campo de TRIBUTAÇÃO vinculada, caso tiver NULL vincular na REFORMA TRIBUTÁRIA\nCORREÇÃO: Verificar a tabela pedido_itens se a coluna id_tributação está NULL se estiver NULL tem que colocar o id_tributação no qual esta configuração a reforma tributária."
+  },
+  {
+    "id": "erp-100",
+    "code": "",
+    "title": "ERRO: could not load xml Falha de validação: documento não contém exatamente um nó raiz.",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO: Verificar no campo de Informações de Retorno na emissão o erro em que retornou, nesse caso o *Lote* do produto estava com um caracter especial (foi corrigido ajustando a descrição do lote)"
+  },
+  {
+    "id": "erp-101",
+    "code": "",
+    "title": "ERRO: Campo dPrevEntrega_B10a não encontrado",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO: A pasta NFe_Update_122025 não foi extraído realizar a extração dos arquivos na pasta programa."
+  },
+  {
+    "id": "erp-102",
+    "code": "213",
+    "title": "ERRO: 213: Rejeição: CNPJ-Base do Emitente difere do CNPJ-Base do Certificado Digital",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO: Verificar o certificado vinculado de acordo com o CNPJ da empresa em que está logado, em Utilitários - Gerenciamento de NFe - (certificado digital)"
+  },
+  {
+    "id": "erp-103",
+    "code": "",
+    "title": "ERRO: { CST } NÃO É ESPERADO, DE ACORDO COM O MODELO DE CONTEÚDO DO ELEMENTO PAI, E { ICMSST }, ESPERADO: [ ORIG ]",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO: Verificar os item do pedido se as informações de Tributação, CST, ORIGEM DA MERCADORIA, estão preenchidos corretamente, não pode estar em branco."
+  },
+  {
+    "id": "erp-104",
+    "code": "625",
+    "title": "ERRO 625: INSCRIÇÃO SUFRAMA DEVE SER INFORMADA NA VENDA COM ISENÇÃO PARA ZFM (nitem:1 )",
+    "category": "Cadastro",
+    "solution": "CORREÇÃO: Verificar se no cadastro do cliente na opção ‘’relacionamentos’’ esta informado a inscrição estadual da SUFRAMA 200840290. Caso não estiver, pode referenciar e tentar emitir a nota novamente."
+  },
+  {
+    "id": "erp-105",
+    "code": "564",
+    "title": "ERRO 564: REJEIÇÃO TOTAL DO PRODUTO/SERVIÇO DIFERE DO SOMATÓRIO DOS ITENS",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO: Quando o pedido é finalizado pelo PDV e o cliente realiza o lançamento de acréscimo pelo pdv, o sistema não calcula o valor nos itens, neste caso tem que remover o acréscimo e colocar o valor como outras despesas."
+  },
+  {
+    "id": "erp-106",
+    "code": "",
+    "title": "ERRO NA EMISSÃO DA NFSE: “STATUS: ERRO MOTIVO: -00000 - A FUNÇÃO DO CALL(N, SCRIPT RUN CLOSURE) NÃO ESTÁ RECEBENDO OS PARÂMETROS CORRETAMENTE.",
+    "category": "Cadastro",
+    "solution": "CORREÇÃO 1: Verificar se o componente e a pasta estão na versão mais recente, caso não esteja é preciso atualizar\nCORREÇÃO 2: Verificar se não tem algum caractere especial no cadastro do cliente (ex: S/N no endereço)\n#ERRO NO APLICATIVO DE BACKUP\nhostname wrong: should be\nCORREÇÃO : Localizar o caminho C:\\Users\\[nome_do_pc]\\.obm e excluir a pasta .obm -> exemplo:"
+  },
+  {
+    "id": "erp-107",
+    "code": "",
+    "title": "ERRO NA EMISSÃO DA NFSE: STATUS: ERRO MOTIVO: -00000 - TOMADOR NOMEADO ‘SUBSTITUTO TRIBUTÁRIO’ PELO MUNICÍPIO. PARA CORREÇÃO, ALTERE A SITUAÇÃO TRIBUTÁRIO PARA ‘ R - RETIDO PELO TO",
+    "category": "Cadastro",
+    "solution": "CORREÇÃO: Verificar o cadastro do cliente se a opção de “Substituto”, no cadastro do clientes está com SIM. Na hora de emitir a NFSE, colocar o reponsável retenção como tomador."
+  },
+  {
+    "id": "erp-108",
+    "code": "642",
+    "title": "REJEIÇÃO: 642 Falha na consulta do registro de passagem, tentar novamente em 5 minutos.",
+    "category": "Fiscal / NF-e",
+    "solution": "CORREÇÃO: A Rejeição 642 indica uma instabilidade temporária nos servidores da SEFAZ. O cancelamento não foi processado naquele momento.\nAguarde alguns minutos: Como o erro é uma falha na consulta de registro da SEFAZ, o recomendado é esperar cerca de 5 a 15 minutos."
+  },
+  {
+    "id": "erp-109",
+    "code": "",
+    "title": "UB: O Dataset não está em modo de edição ou inserção",
+    "category": "MDF-e",
+    "solution": "CORREÇÃO: Verificar a versão do esquema da nfe, caso esteja com algum mais antigo trocar para a versão mais recente e tentar emitir novamente\n#ERRO Erro na emissão de NFe ao Enviar\nMensagem Adicional: O arquivo contém 1 ou mais erros no de validação de esquema '-2.34' viola a restrição pattern de '0\\|0\\.[0-9]{2}\\|[1-9]{1}[0-9]{0,12}(\\.[0-9]{2})?'.\nFalha da análise do elemento '{http\\://www.portalfiscal.inf.br/nfe}vICMSST' com valor '-2.34'\nCORREÇÃO: Corrija as alíquotas de ICMS e os parâmetros de MVA do item conforme a documentação fiscal correta e recalcule a nota. Certifique-se de que o valor de ICMS ST resultante seja maior ou igual a zero.\n#ERRO Erro na emissão de NFe sem Protocolo\ncStat : 1118\nxMotivo : Rejeicao: Total de IBS e CBS informado indevidamente\nCORREÇÃO: Informar o campo tributação no cadastro do produto\n#ERRO_TRANSPORTE Falha em obter Provedor de Criptografia do Certificado. Erro: 80090014 , erro: \\$80090014. [ OK ]\nCORREÇÃO: Para solucionar este erro, é necessário remover o certificado digital do sistema e adicioná-lo novamente para restabelecer a comunicação.\n#ERRO O Sistema não conseguiu receber o Protocolo, verifique o o campo de retorno. cStat : 1117 xMotivo :"
+  }
+]

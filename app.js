@@ -847,7 +847,32 @@
 
         if (result.summary) box.append(el('div', { class: 'ai-summary', text: result.summary }));
 
-        result.matches.forEach((m) => {
+        const ragSources = Array.isArray(result.ragSources) ? result.ragSources : [];
+        if (ragSources.length) {
+            const ragWrap = el('div', { class: 'ai-rag-section' },
+                el('div', { class: 'ai-rag-heading', text: `Fontes recuperadas na Base ERP (${ragSources.length})` })
+            );
+            ragSources.forEach((src) => {
+                const pct = Math.round((src.relevance || 0) * 100);
+                const badgeText = src.cited ? `${pct}% · Citado` : `${pct}%`;
+                ragWrap.append(
+                    el(
+                        'div',
+                        { class: 'ai-rag-card' },
+                        el('div', { class: 'ai-rag-head' },
+                            el('span', { class: 'ai-rag-cat', text: src.category }),
+                            el('span', { class: 'ai-confidence' + (src.relevance >= 0.65 ? '' : ' mid'), text: badgeText })
+                        ),
+                        el('h4', { text: src.title }),
+                        src.citationReason ? el('p', { class: 'ai-rag-reason', text: src.citationReason }) : null,
+                        el('p', { class: 'ai-rag-solution', text: src.solution })
+                    )
+                );
+            });
+            box.append(ragWrap);
+        }
+
+        (result.matches || []).forEach((m) => {
             const s = state.scripts.find((x) => x.id === m.id);
             if (!s) return;
 
@@ -875,7 +900,7 @@
             box.append(cand);
         });
 
-        if (!box.querySelector('.ai-candidate')) {
+        if (!box.querySelector('.ai-candidate') && !ragSources.length) {
             box.append(
                 el('button', {
                     class: 'btn btn-outline',
@@ -897,13 +922,9 @@
             setStatus(status, 'Cole o erro primeiro.', true);
             return;
         }
-        if (!state.scripts.length) {
-            setStatus(status, 'Sua biblioteca está vazia. Cadastre scripts antes.', true);
-            return;
-        }
         const btn = $('btnAiRun');
         btn.disabled = true;
-        setStatus(status, 'Analisando…');
+        setStatus(status, 'Consultando base RAG e analisando…');
         $('aiResult').hidden = true;
         try {
             // Só metadados: o código SQL não sai do navegador

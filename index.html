@@ -221,14 +221,14 @@
     <div class="overlay" id="aiOverlay" role="dialog" aria-modal="true" aria-labelledby="aiTitle">
         <div class="modal modal-md">
             <div class="modal-header">
-                <h2 id="aiTitle">Diagnosticar erro</h2>
+                <h2 id="aiTitle">Diagnosticar erro (Copilot RAG)</h2>
                 <button type="button" class="btn btn-outline" id="btnAiClose"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg>Fechar</button>
             </div>
             <div class="modal-body">
                 <div class="input-group">
-                    <label for="aiErrorInput">Cole a mensagem de erro (ou descreva o problema do cliente)</label>
-                    <textarea id="aiErrorInput" class="error-area ai-input" rows="5" placeholder="Ex: SQL error code = -206, Column unknown CFOP_S_E"></textarea>
-                    <p class="label-hint">O erro e os títulos/descrições dos scripts são enviados ao Gemini para a análise. O código SQL não é enviado. Não inclua nomes ou dados de clientes.</p>
+                    <label for="aiErrorInput">Cole a mensagem de erro (ou descreva o problema fiscal/ERP do cliente)</label>
+                    <textarea id="aiErrorInput" class="error-area ai-input" rows="5" placeholder="Ex: Erro 531 Total da BC ICMS difere do somatório dos itens, ou SQL error code = -206"></textarea>
+                    <p class="label-hint">O erro é consultado na base de conhecimento ERP (RAG) e nos metadados dos seus scripts via Gemini. O código SQL não é enviado. Não inclua nomes ou dados de clientes.</p>
                 </div>
                 <div class="ai-row">
                     <button type="button" class="btn btn-ai" id="btnAiRun">Analisar</button>
